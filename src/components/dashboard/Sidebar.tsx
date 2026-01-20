@@ -89,7 +89,7 @@ export function Sidebar() {
             <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center shadow-glow">
               <TrendingUp className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold text-gradient">FinanzasPro</span>
+            <span className="text-xl font-bold text-gradient">BudgetTrack</span>
           </div>
 
           {/* Navigation */}
