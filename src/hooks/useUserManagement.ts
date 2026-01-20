@@ -66,15 +66,42 @@ export function useUsers() {
       
       if (profilesError) throw profilesError;
       
+      // Get all accepted invitations to match users without profile email
+      const { data: invitations, error: invError } = await supabase
+        .from('invitations')
+        .select('email, is_accepted')
+        .eq('is_accepted', true);
+      
+      if (invError) throw invError;
+      
       // Combine data
       const users: UserWithRole[] = (roles || []).map((role) => {
         const profile = profiles?.find(p => p.id === role.user_id);
         const isExpired = role.expires_at ? new Date(role.expires_at) < new Date() : false;
+        
+        // Get email: prioritize profile email, fallback to invitation email
+        let userEmail = profile?.email;
+        let userName = profile?.full_name;
+        
+        // If profile exists but has no email, try to find matching invitation
+        if (profile && !userEmail) {
+          // Find invitation that matches this user - we can match by checking
+          // if there's an accepted invitation with no other user using that email
+          const matchingInvitation = invitations?.find(inv => {
+            // Check if any profile has this email
+            const profileWithEmail = profiles?.find(p => p.email === inv.email);
+            return profileWithEmail?.id === profile.id;
+          });
+          if (matchingInvitation) {
+            userEmail = matchingInvitation.email;
+          }
+        }
+        
         return {
           id: role.user_id,
-          email: profile?.email || 'Sin email',
-          full_name: profile?.full_name,
-          avatar_url: profile?.avatar_url,
+          email: userEmail || 'Sin email',
+          full_name: userName || null,
+          avatar_url: profile?.avatar_url || null,
           role: role.role as 'admin' | 'user',
           created_at: role.created_at,
           is_active: !isExpired,
