@@ -30,8 +30,8 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    const appUrl = Deno.env.get("SUPABASE_URL")?.replace('.supabase.co', '') || 'https://app.budgettrack.com';
-    const signupUrl = `${appUrl}`;
+    // URL de la aplicación publicada
+    const signupUrl = "https://smart-spen-so.lovable.app";
 
     const emailResponse = await resend.emails.send({
       from: "BudgetTrack <hola@budgettrack.site>",
