@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useProfile } from '@/hooks/useProfile';
+import { useIsAdmin } from '@/hooks/useUserManagement';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +18,7 @@ import {
   LogOut,
   Menu,
   X,
+  Shield,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
@@ -36,6 +38,7 @@ export function Sidebar() {
   const location = useLocation();
   const { signOut, user } = useAuth();
   const { data: profile } = useProfile();
+  const { data: isAdmin } = useIsAdmin();
   const [isOpen, setIsOpen] = useState(false);
 
   // Apply theme color to document
@@ -147,6 +150,23 @@ export function Sidebar() {
                 </Link>
               );
             })}
+            
+            {/* Admin link - only visible to admins */}
+            {isAdmin && (
+              <Link
+                to="/admin"
+                onClick={() => setIsOpen(false)}
+                className={cn(
+                  'flex items-center gap-3 px-3 py-3 sm:py-2.5 rounded-lg text-sm font-medium transition-all duration-200 active:scale-[0.98]',
+                  location.pathname === '/admin'
+                    ? 'bg-primary text-primary-foreground shadow-soft'
+                    : 'text-muted-foreground hover:bg-secondary hover:text-foreground active:bg-secondary'
+                )}
+              >
+                <Shield className="w-5 h-5 shrink-0" />
+                <span className="truncate">Administración</span>
+              </Link>
+            )}
           </nav>
 
           {/* User section */}

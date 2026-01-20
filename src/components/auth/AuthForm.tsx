@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -17,6 +18,23 @@ export function AuthForm() {
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
 
+  const checkInvitation = async (email: string): Promise<boolean> => {
+    const { data, error } = await supabase
+      .from('invitations')
+      .select('id')
+      .eq('email', email.toLowerCase())
+      .eq('is_active', true)
+      .eq('is_accepted', false)
+      .maybeSingle();
+    
+    if (error) {
+      console.error('Error checking invitation:', error);
+      return false;
+    }
+    
+    return !!data;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -32,6 +50,19 @@ export function AuthForm() {
           });
         }
       } else {
+        // Check if email is invited before allowing registration
+        const isInvited = await checkInvitation(email);
+        
+        if (!isInvited) {
+          toast({
+            title: 'Acceso restringido',
+            description: 'Necesitas una invitación para registrarte. Contacta al administrador.',
+            variant: 'destructive',
+          });
+          setLoading(false);
+          return;
+        }
+
         const { error } = await signUp(email, password, fullName);
         if (error) {
           toast({
