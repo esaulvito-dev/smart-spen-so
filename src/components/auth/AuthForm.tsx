@@ -191,7 +191,7 @@ export function AuthForm() {
         </div>
 
         {/* Right Side - Auth Form */}
-        <div className="lg:w-[480px] xl:w-[520px] flex items-center justify-center p-4 lg:p-8">
+        <div className="lg:w-[480px] xl:w-[520px] flex items-center justify-center lg:justify-start p-4 lg:p-8 lg:pl-0">
           <Card className="w-full max-w-md shadow-elevated animate-slide-up border-0 bg-card/95 backdrop-blur-md">
             <CardHeader className="text-center space-y-3 sm:space-y-4 pb-4 sm:pb-6">
               <div className="mx-auto w-12 h-12 sm:w-14 sm:h-14 gradient-primary rounded-xl sm:rounded-2xl flex items-center justify-center shadow-glow lg:hidden">
