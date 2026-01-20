@@ -21,6 +21,7 @@ export interface Invitation {
   is_active: boolean;
   created_at: string;
   accepted_at: string | null;
+  access_expires_at: string | null;
 }
 
 export function useIsAdmin() {
@@ -106,7 +107,7 @@ export function useCreateInvitation() {
   const { user } = useAuth();
 
   return useMutation({
-    mutationFn: async (email: string) => {
+    mutationFn: async ({ email, accessExpiresAt }: { email: string; accessExpiresAt: string | null }) => {
       if (!user?.id) throw new Error('No user');
       
       // First create the invitation in the database
@@ -115,6 +116,7 @@ export function useCreateInvitation() {
         .insert({
           email: email.toLowerCase(),
           invited_by: user.id,
+          access_expires_at: accessExpiresAt,
         })
         .select()
         .single();
@@ -135,6 +137,45 @@ export function useCreateInvitation() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-invitations'] });
+    },
+  });
+}
+
+export function useRevokeUserFromInvitation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (email: string) => {
+      // Find the user by email in profiles
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email.toLowerCase())
+        .single();
+      
+      if (profileError && profileError.code !== 'PGRST116') throw profileError;
+      
+      // If user exists, remove their access
+      if (profile) {
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', profile.id);
+        
+        if (roleError) throw roleError;
+      }
+      
+      // Deactivate the invitation
+      const { error: invError } = await supabase
+        .from('invitations')
+        .update({ is_active: false })
+        .eq('email', email.toLowerCase());
+      
+      if (invError) throw invError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-invitations'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
     },
   });
 }
