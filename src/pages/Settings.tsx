@@ -35,7 +35,6 @@ export default function SettingsPage() {
   const [uploading, setUploading] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Initialize state when profile loads
   useEffect(() => {
     if (profile) {
       setFullName(profile.full_name || '');
@@ -69,7 +68,6 @@ export default function SettingsPage() {
     setTempImageUrl(url);
     setCropperOpen(true);
     
-    // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -82,7 +80,6 @@ export default function SettingsPage() {
     try {
       const fileName = `${user.id}/avatar-${Date.now()}.jpg`;
       
-      // Delete old avatar if exists
       if (profile?.avatar_url) {
         const oldPath = profile.avatar_url.split('/avatars/')[1];
         if (oldPath) {
@@ -90,7 +87,6 @@ export default function SettingsPage() {
         }
       }
 
-      // Upload new avatar
       const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(fileName, blob, {
@@ -100,12 +96,10 @@ export default function SettingsPage() {
 
       if (uploadError) throw uploadError;
 
-      // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('avatars')
         .getPublicUrl(fileName);
 
-      // Update profile
       await updateProfile.mutateAsync({
         avatar_url: publicUrl,
       });
@@ -135,13 +129,11 @@ export default function SettingsPage() {
     
     setDeleting(true);
     try {
-      // Extract file path from URL
       const urlParts = profile.avatar_url.split('/avatars/');
       if (urlParts[1]) {
         await supabase.storage.from('avatars').remove([urlParts[1]]);
       }
 
-      // Update profile to remove avatar
       await updateProfile.mutateAsync({
         avatar_url: null,
       });
@@ -211,8 +203,6 @@ export default function SettingsPage() {
       .slice(0, 2);
   };
 
-  const currentThemeClass = selectedTheme !== 'emerald' ? `theme-${selectedTheme}` : '';
-
   if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
@@ -222,46 +212,45 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className={`min-h-screen bg-background ${currentThemeClass}`}>
+    <div className="min-h-screen min-h-[100dvh] bg-background">
       <Sidebar />
-      <main className="lg:pl-64 p-4 lg:p-8 pt-20 lg:pt-8">
-        <div className="max-w-3xl mx-auto space-y-8">
+      <main className="lg:pl-64 p-3 sm:p-4 lg:p-8 pt-[72px] lg:pt-8 pb-6">
+        <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6 lg:space-y-8">
           {/* Header */}
-          <div>
-            <h1 className="text-2xl lg:text-3xl font-bold flex items-center gap-3">
-              <div className="w-10 h-10 gradient-primary rounded-xl flex items-center justify-center">
-                <SettingsIcon className="w-5 h-5 text-primary-foreground" />
-              </div>
-              Configuración
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Personaliza tu experiencia
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 gradient-primary rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+              <SettingsIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">Configuración</h1>
+              <p className="text-sm text-muted-foreground hidden sm:block">
+                Personaliza tu experiencia
+              </p>
+            </div>
           </div>
 
           {/* Profile Settings */}
           <Card className="shadow-soft border-border/50">
-            <CardHeader>
+            <CardHeader className="pb-2 sm:pb-4">
               <div className="flex items-center gap-3">
-                <User className="w-5 h-5 text-primary" />
+                <User className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                 <div>
-                  <CardTitle className="text-lg">Perfil</CardTitle>
-                  <CardDescription>Información de tu cuenta</CardDescription>
+                  <CardTitle className="text-base sm:text-lg">Perfil</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">Información de tu cuenta</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-6">
               {/* Avatar Section */}
-              <div className="flex flex-col sm:flex-row items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                 <div className="relative group">
-                  <Avatar className="w-24 h-24 border-4 border-primary/20">
+                  <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-primary/20">
                     <AvatarImage src={profile?.avatar_url || undefined} />
-                    <AvatarFallback className="bg-primary/10 text-primary text-2xl font-medium">
+                    <AvatarFallback className="bg-primary/10 text-primary text-xl sm:text-2xl font-medium">
                       {getInitials(fullName || profile?.full_name)}
                     </AvatarFallback>
                   </Avatar>
                   
-                  {/* Overlay on hover */}
                   <div 
                     className="absolute inset-0 rounded-full bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer"
                     onClick={() => fileInputRef.current?.click()}
@@ -270,7 +259,7 @@ export default function SettingsPage() {
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2 w-full sm:w-auto">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -284,6 +273,7 @@ export default function SettingsPage() {
                     size="sm"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={uploading}
+                    className="w-full sm:w-auto h-10 sm:h-9"
                   >
                     {uploading ? (
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -297,7 +287,7 @@ export default function SettingsPage() {
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      className="w-full sm:w-auto h-10 sm:h-9 text-destructive hover:text-destructive hover:bg-destructive/10"
                       onClick={handleDeleteAvatar}
                       disabled={deleting}
                     >
@@ -310,33 +300,34 @@ export default function SettingsPage() {
                     </Button>
                   )}
                   
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground text-center sm:text-left">
                     JPG, PNG o GIF. Máximo 5MB.
                   </p>
                 </div>
               </div>
 
               {/* Name */}
-              <div className="space-y-2">
-                <Label htmlFor="fullName">Nombre completo</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="fullName" className="text-sm">Nombre completo</Label>
                 <Input
                   id="fullName"
                   type="text"
                   placeholder="Tu nombre"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
+                  className="h-11 sm:h-10 text-base sm:text-sm"
                 />
               </div>
 
               {/* Email (read-only) */}
-              <div className="space-y-2">
-                <Label htmlFor="email">Correo electrónico</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="email" className="text-sm">Correo electrónico</Label>
                 <Input
                   id="email"
                   type="email"
                   value={user?.email || ''}
                   disabled
-                  className="bg-muted"
+                  className="h-11 sm:h-10 text-base sm:text-sm bg-muted"
                 />
                 <p className="text-xs text-muted-foreground">
                   El correo electrónico no se puede cambiar
@@ -346,7 +337,7 @@ export default function SettingsPage() {
               <Button 
                 onClick={handleSaveProfile}
                 disabled={updateProfile.isPending}
-                className="gradient-primary text-primary-foreground hover:opacity-90"
+                className="w-full sm:w-auto h-11 sm:h-10 gradient-primary text-primary-foreground hover:opacity-90"
               >
                 {updateProfile.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Guardar cambios
@@ -356,17 +347,17 @@ export default function SettingsPage() {
 
           {/* Theme Settings */}
           <Card className="shadow-soft border-border/50">
-            <CardHeader>
+            <CardHeader className="pb-2 sm:pb-4">
               <div className="flex items-center gap-3">
-                <Palette className="w-5 h-5 text-primary" />
+                <Palette className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                 <div>
-                  <CardTitle className="text-lg">Tema</CardTitle>
-                  <CardDescription>Personaliza los colores de tu dashboard</CardDescription>
+                  <CardTitle className="text-base sm:text-lg">Tema</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">Personaliza los colores</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+            <CardContent className="px-3 sm:px-6">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4">
                 {themeColors.map((theme) => {
                   const isSelected = selectedTheme === theme.id;
                   return (
@@ -374,23 +365,23 @@ export default function SettingsPage() {
                       key={theme.id}
                       onClick={() => handleSaveTheme(theme.id)}
                       className={cn(
-                        'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all hover:scale-105',
+                        'flex flex-col items-center gap-1.5 sm:gap-2 p-2 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all active:scale-95',
                         isSelected
                           ? 'border-primary bg-primary/5 shadow-glow'
                           : 'border-border hover:border-primary/50'
                       )}
                     >
                       <div className={cn(
-                        'w-12 h-12 rounded-full flex items-center justify-center shadow-md transition-transform',
+                        'w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-md transition-transform',
                         theme.color,
                         isSelected && 'scale-110'
                       )}>
                         {isSelected && (
-                          <Check className="w-6 h-6 text-white" />
+                          <Check className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                         )}
                       </div>
                       <span className={cn(
-                        'text-sm font-medium',
+                        'text-xs sm:text-sm font-medium truncate w-full text-center',
                         isSelected && 'text-primary'
                       )}>
                         {theme.name}
@@ -400,15 +391,14 @@ export default function SettingsPage() {
                 })}
               </div>
               
-              <p className="text-sm text-muted-foreground mt-4 text-center">
-                El tema seleccionado se aplica a todo tu dashboard
+              <p className="text-xs sm:text-sm text-muted-foreground mt-4 text-center">
+                El tema se aplica a todo tu dashboard
               </p>
             </CardContent>
           </Card>
         </div>
       </main>
 
-      {/* Avatar Cropper Dialog */}
       <AvatarCropper
         open={cropperOpen}
         onOpenChange={setCropperOpen}

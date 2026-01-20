@@ -37,10 +37,10 @@ export default function Dashboard() {
   }, [monthTransactions]);
 
   const formatCurrency = (amount: number) => {
-    return `$${Math.abs(amount).toLocaleString('es-MX', { minimumFractionDigits: 2 })}`;
+    return `$${Math.abs(amount).toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
   };
 
-  const currentMonth = format(now, "MMMM 'de' yyyy", { locale: es });
+  const currentMonth = format(now, "MMMM yyyy", { locale: es });
   const greeting = profile?.full_name 
     ? `¡Hola, ${profile.full_name.split(' ')[0]}!` 
     : '¡Bienvenido!';
@@ -54,15 +54,15 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen min-h-[100dvh] bg-background">
       <Sidebar />
-      <main className="lg:pl-64 p-4 lg:p-8 pt-20 lg:pt-8">
-        <div className="max-w-7xl mx-auto space-y-8">
+      <main className="lg:pl-64 p-3 sm:p-4 lg:p-8 pt-[72px] lg:pt-8 pb-6">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 lg:space-y-8">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
             <div>
-              <h1 className="text-2xl lg:text-3xl font-bold">{greeting}</h1>
-              <p className="text-muted-foreground">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">{greeting}</h1>
+              <p className="text-sm sm:text-base text-muted-foreground">
                 Resumen de {currentMonth}
               </p>
             </div>
@@ -70,11 +70,11 @@ export default function Dashboard() {
           </div>
 
           {/* Stats Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <StatsCard
-              title="Balance del mes"
+              title="Balance"
               value={formatCurrency(stats.balance)}
-              subtitle={stats.balance >= 0 ? 'Vas bien 💪' : 'Cuidado con los gastos'}
+              subtitle={stats.balance >= 0 ? 'Vas bien 💪' : 'Cuidado'}
               icon={Wallet}
               variant="balance"
             />
@@ -91,7 +91,7 @@ export default function Dashboard() {
               variant="expense"
             />
             <StatsCard
-              title="Tasa de ahorro"
+              title="Ahorro"
               value={`${stats.savingsRate}%`}
               subtitle={Number(stats.savingsRate) >= 20 ? '¡Excelente!' : 'Meta: 20%'}
               icon={PiggyBank}
@@ -99,21 +99,21 @@ export default function Dashboard() {
           </div>
 
           {/* Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <Card className="shadow-soft border-border/50">
-              <CardHeader>
-                <CardTitle className="text-lg">Gastos por categoría</CardTitle>
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-base sm:text-lg">Gastos por categoría</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-2 sm:px-6">
                 <ExpenseChart transactions={monthTransactions} />
               </CardContent>
             </Card>
 
             <Card className="shadow-soft border-border/50">
-              <CardHeader>
-                <CardTitle className="text-lg">Resumen mensual</CardTitle>
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-base sm:text-lg">Resumen mensual</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-2 sm:px-6">
                 <MonthlyChart transactions={allTransactions} />
               </CardContent>
             </Card>
@@ -121,10 +121,10 @@ export default function Dashboard() {
 
           {/* Recent Transactions */}
           <Card className="shadow-soft border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg">Transacciones recientes</CardTitle>
+            <CardHeader className="pb-2 sm:pb-4">
+              <CardTitle className="text-base sm:text-lg">Transacciones recientes</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 sm:px-6">
               <TransactionList transactions={allTransactions.slice(0, 10)} />
             </CardContent>
           </Card>

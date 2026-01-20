@@ -33,38 +33,38 @@ export function TransactionList({ transactions, showDelete = false }: Transactio
 
   if (transactions.length === 0) {
     return (
-      <div className="text-center py-12 text-muted-foreground">
-        <p>No hay transacciones para mostrar</p>
+      <div className="text-center py-8 sm:py-12 text-muted-foreground">
+        <p className="text-sm sm:text-base">No hay transacciones para mostrar</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-2 sm:space-y-3">
       {transactions.map((transaction) => (
         <div
           key={transaction.id}
-          className="flex items-center gap-4 p-4 bg-card rounded-lg border border-border/50 hover:shadow-soft transition-shadow animate-fade-in"
+          className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-card rounded-lg border border-border/50 hover:shadow-soft transition-shadow animate-fade-in active:bg-secondary/50"
         >
-          <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center text-lg">
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-secondary flex items-center justify-center text-base sm:text-lg shrink-0">
             {CATEGORY_ICONS[transaction.category]}
           </div>
           
           <div className="flex-1 min-w-0">
-            <p className="font-medium truncate">
+            <p className="font-medium text-sm sm:text-base truncate">
               {transaction.description || CATEGORY_LABELS[transaction.category]}
             </p>
-            <p className="text-sm text-muted-foreground">
-              {CATEGORY_LABELS[transaction.category]} • {format(new Date(transaction.date), "d 'de' MMMM", { locale: es })}
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">
+              {CATEGORY_LABELS[transaction.category]} • {format(new Date(transaction.date), "d MMM", { locale: es })}
             </p>
           </div>
           
-          <div className="text-right">
+          <div className="text-right shrink-0">
             <p className={cn(
-              'font-semibold',
+              'font-semibold text-sm sm:text-base',
               transaction.type === 'income' ? 'text-success' : 'text-destructive'
             )}>
-              {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+              {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
             </p>
           </div>
 
@@ -72,7 +72,7 @@ export function TransactionList({ transactions, showDelete = false }: Transactio
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground hover:text-destructive"
+              className="text-muted-foreground hover:text-destructive shrink-0 w-9 h-9 sm:w-10 sm:h-10"
               onClick={() => handleDelete(transaction.id)}
               disabled={deleteTransaction.isPending}
             >

@@ -28,7 +28,7 @@ export default function Income() {
     [monthTransactions]
   );
 
-  const currentMonth = format(now, "MMMM 'de' yyyy", { locale: es });
+  const currentMonth = format(now, "MMMM yyyy", { locale: es });
 
   if (isLoading) {
     return (
@@ -39,38 +39,38 @@ export default function Income() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen min-h-[100dvh] bg-background">
       <Sidebar />
-      <main className="lg:pl-64 p-4 lg:p-8 pt-20 lg:pt-8">
-        <div className="max-w-5xl mx-auto space-y-8">
+      <main className="lg:pl-64 p-3 sm:p-4 lg:p-8 pt-[72px] lg:pt-8 pb-6">
+        <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6 lg:space-y-8">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-bold flex items-center gap-3">
-                <div className="w-10 h-10 gradient-income rounded-xl flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-primary-foreground" />
-                </div>
-                Ingresos
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Gestiona todos tus ingresos
-              </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 gradient-income rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+                <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">Ingresos</h1>
+                <p className="text-sm text-muted-foreground hidden sm:block">
+                  Gestiona todos tus ingresos
+                </p>
+              </div>
             </div>
             <AddTransactionDialog defaultType="income" />
           </div>
 
           {/* Monthly Summary */}
           <Card className="shadow-soft border-border/50 border-l-4 border-l-success">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Ingresos de {currentMonth}</p>
-                  <p className="text-3xl font-bold text-success">
-                    +${monthlyIncome.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Ingresos de {currentMonth}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-success">
+                    +${monthlyIncome.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                   </p>
                 </div>
-                <div className="w-16 h-16 gradient-income rounded-2xl flex items-center justify-center">
-                  <TrendingUp className="w-8 h-8 text-primary-foreground" />
+                <div className="w-12 h-12 sm:w-16 sm:h-16 gradient-income rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
+                  <TrendingUp className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground" />
                 </div>
               </div>
             </CardContent>
@@ -78,10 +78,10 @@ export default function Income() {
 
           {/* Transaction List */}
           <Card className="shadow-soft border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg">Historial de ingresos</CardTitle>
+            <CardHeader className="pb-2 sm:pb-4">
+              <CardTitle className="text-base sm:text-lg">Historial de ingresos</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 sm:px-6">
               <TransactionList transactions={incomeTransactions} showDelete />
             </CardContent>
           </Card>
