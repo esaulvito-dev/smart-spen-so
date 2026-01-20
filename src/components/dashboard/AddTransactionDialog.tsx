@@ -49,7 +49,7 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
       
       toast({
         title: type === 'income' ? 'Ingreso registrado' : 'Gasto registrado',
-        description: `Se ha registrado ${type === 'income' ? 'un ingreso' : 'un gasto'} de $${parsedAmount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`,
+        description: `Se ha registrado ${type === 'income' ? 'un ingreso' : 'un gasto'} de S/ ${parsedAmount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`,
       });
       
       // Reset form
@@ -113,7 +113,7 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="amount" className="text-sm">Monto</Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">S/</span>
               <Input
                 id="amount"
                 type="number"
@@ -122,7 +122,7 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="pl-7 h-11 sm:h-10 text-base sm:text-sm"
+                className="pl-9 h-11 sm:h-10 text-base sm:text-sm"
                 required
               />
             </div>

@@ -79,7 +79,7 @@ export default function Expenses() {
                 <div className="min-w-0">
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">Gastos de {currentMonth}</p>
                   <p className="text-2xl sm:text-3xl font-bold text-destructive">
-                    -${monthlyExpenses.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                    -S/ {monthlyExpenses.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                 </div>
                 <div className="w-12 h-12 sm:w-16 sm:h-16 gradient-expense rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
@@ -107,7 +107,7 @@ export default function Expenses() {
                             <span className="font-medium text-sm sm:text-base truncate">{CATEGORY_LABELS[category as TransactionCategory]}</span>
                           </div>
                           <span className="font-semibold text-sm sm:text-base shrink-0">
-                            ${amount.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                            S/ {amount.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </span>
                         </div>
                         <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">

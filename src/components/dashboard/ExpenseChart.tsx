@@ -65,7 +65,7 @@ export function ExpenseChart({ transactions }: ExpenseChartProps) {
             ))}
           </Pie>
           <Tooltip 
-            formatter={(value: number) => [`$${value.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, 'Monto']}
+            formatter={(value: number) => [`S/ ${value.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`, 'Monto']}
             contentStyle={{ 
               backgroundColor: 'hsl(var(--card))', 
               border: '1px solid hsl(var(--border))',
