@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Mail, Lock, User, TrendingUp } from 'lucide-react';
+import loginBackground from '@/assets/login-background.png';
 
 export function AuthForm() {
   const [isLogin, setIsLogin] = useState(true);
@@ -52,11 +53,12 @@ export function AuthForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 gradient-hero">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl animate-pulse-slow" />
-        <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse-slow" />
-      </div>
+    <div 
+      className="min-h-screen flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${loginBackground})` }}
+    >
+      {/* Overlay for better contrast */}
+      <div className="absolute inset-0 bg-black/40" />
 
       <Card className="w-full max-w-md shadow-elevated animate-slide-up relative z-10 border-0">
         <CardHeader className="text-center space-y-4">
