@@ -108,6 +108,36 @@ export function useDeleteTransaction() {
   });
 }
 
+export interface UpdateTransaction {
+  id: string;
+  type?: TransactionType;
+  category?: TransactionCategory;
+  amount?: number;
+  description?: string | null;
+  date?: string;
+}
+
+export function useUpdateTransaction() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, ...updates }: UpdateTransaction) => {
+      const { data, error } = await supabase
+        .from('transactions')
+        .update(updates)
+        .eq('id', id)
+        .select()
+        .single();
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    },
+  });
+}
+
 export const CATEGORY_LABELS: Record<TransactionCategory, string> = {
   hogar: 'Hogar',
   negocio: 'Negocio',

@@ -130,7 +130,7 @@ export default function Expenses() {
               <CardTitle className="text-base sm:text-lg">Historial de gastos</CardTitle>
             </CardHeader>
             <CardContent className="px-3 sm:px-6">
-              <TransactionList transactions={expenseTransactions} showDelete />
+              <TransactionList transactions={expenseTransactions} showDelete showEdit />
             </CardContent>
           </Card>
         </div>
