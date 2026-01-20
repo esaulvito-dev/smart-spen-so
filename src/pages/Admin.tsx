@@ -8,6 +8,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   Table,
   TableBody,
   TableCell,
@@ -36,6 +43,7 @@ import {
   useDeleteInvitation,
   useResendInvitation,
   useSetUserExpiration,
+  useRevokeUserFromInvitation,
 } from '@/hooks/useUserManagement';
 import { SetExpirationDialog } from '@/components/dashboard/SetExpirationDialog';
 import { useAuth } from '@/contexts/AuthContext';
@@ -52,10 +60,13 @@ import {
   CheckCircle,
   XCircle,
   CalendarClock,
+  Ban,
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { format, addMonths, addDays } from 'date-fns';
 import { es } from 'date-fns/locale';
+
+type AccessDuration = '1m' | '3m' | '6m' | '1y' | 'custom' | 'permanent';
 
 export default function Admin() {
   const { user } = useAuth();
@@ -69,8 +80,11 @@ export default function Admin() {
   const deleteInvitation = useDeleteInvitation();
   const resendInvitation = useResendInvitation();
   const setUserExpiration = useSetUserExpiration();
+  const revokeUserFromInvitation = useRevokeUserFromInvitation();
   
   const [newEmail, setNewEmail] = useState('');
+  const [accessDuration, setAccessDuration] = useState<AccessDuration>('permanent');
+  const [customDays, setCustomDays] = useState('');
 
   if (checkingAdmin) {
     return (
@@ -84,14 +98,37 @@ export default function Admin() {
     return <Navigate to="/dashboard" replace />;
   }
 
+  const calculateExpirationDate = (): string | null => {
+    const now = new Date();
+    switch (accessDuration) {
+      case '1m': return addMonths(now, 1).toISOString();
+      case '3m': return addMonths(now, 3).toISOString();
+      case '6m': return addMonths(now, 6).toISOString();
+      case '1y': return addMonths(now, 12).toISOString();
+      case 'custom': 
+        const days = parseInt(customDays);
+        return days > 0 ? addDays(now, days).toISOString() : null;
+      default: return null;
+    }
+  };
+
   const handleInvite = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEmail.trim()) return;
     
+    if (accessDuration === 'custom' && (!customDays || parseInt(customDays) <= 0)) {
+      toast.error('Por favor ingresa un número de días válido');
+      return;
+    }
+    
+    const expiresAt = calculateExpirationDate();
+    
     try {
-      await createInvitation.mutateAsync(newEmail.trim());
+      await createInvitation.mutateAsync({ email: newEmail.trim(), accessExpiresAt: expiresAt });
       toast.success('Invitación enviada correctamente');
       setNewEmail('');
+      setAccessDuration('permanent');
+      setCustomDays('');
     } catch (error: any) {
       if (error.code === '23505') {
         toast.error('Este email ya ha sido invitado');
@@ -147,6 +184,15 @@ export default function Admin() {
       }
     } catch (error) {
       toast.error('Error al configurar el acceso');
+    }
+  };
+
+  const handleRevokeFromInvitation = async (email: string) => {
+    try {
+      await revokeUserFromInvitation.mutateAsync(email);
+      toast.success(`Acceso revocado para ${email}`);
+    } catch (error) {
+      toast.error('Error al revocar el acceso');
     }
   };
 
@@ -252,23 +298,50 @@ export default function Admin() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleInvite} className="flex gap-3">
-                <Input
-                  type="email"
-                  placeholder="correo@ejemplo.com"
-                  value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
-                  className="flex-1"
-                  required
-                />
-                <Button type="submit" disabled={createInvitation.isPending}>
-                  {createInvitation.isPending ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Mail className="w-4 h-4 mr-2" />
+              <form onSubmit={handleInvite} className="space-y-4">
+                <div className="flex flex-col md:flex-row gap-3">
+                  <Input
+                    type="email"
+                    placeholder="correo@ejemplo.com"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    className="flex-1"
+                    required
+                  />
+                  <Select value={accessDuration} onValueChange={(value: AccessDuration) => setAccessDuration(value)}>
+                    <SelectTrigger className="w-full md:w-[200px]">
+                      <SelectValue placeholder="Duración del acceso" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="permanent">Permanente</SelectItem>
+                      <SelectItem value="1m">1 Mes</SelectItem>
+                      <SelectItem value="3m">3 Meses</SelectItem>
+                      <SelectItem value="6m">6 Meses</SelectItem>
+                      <SelectItem value="1y">1 Año</SelectItem>
+                      <SelectItem value="custom">Personalizado (Días)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {accessDuration === 'custom' && (
+                    <Input
+                      type="number"
+                      placeholder="Número de días"
+                      value={customDays}
+                      onChange={(e) => setCustomDays(e.target.value)}
+                      className="w-full md:w-[150px]"
+                      min="1"
+                    />
                   )}
-                  Enviar invitación
-                </Button>
+                </div>
+                <div className="flex justify-end">
+                  <Button type="submit" disabled={createInvitation.isPending}>
+                    {createInvitation.isPending ? (
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    ) : (
+                      <Mail className="w-4 h-4 mr-2" />
+                    )}
+                    Enviar invitación
+                  </Button>
+                </div>
               </form>
             </CardContent>
           </Card>
@@ -444,13 +517,14 @@ export default function Admin() {
                           <TableRow>
                             <TableHead>Email</TableHead>
                             <TableHead>Estado</TableHead>
-                            <TableHead>Fecha</TableHead>
+                            <TableHead>Vence el</TableHead>
+                            <TableHead>Fecha envío</TableHead>
                             <TableHead className="text-right">Acciones</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {invitations.map((inv) => (
-                            <TableRow key={inv.id}>
+                            <TableRow key={inv.id} className={!inv.is_active ? 'opacity-60' : ''}>
                               <TableCell className="font-medium">{inv.email}</TableCell>
                               <TableCell>
                                 {inv.is_accepted ? (
@@ -465,8 +539,21 @@ export default function Admin() {
                                   </Badge>
                                 ) : (
                                   <Badge variant="outline" className="gap-1 text-destructive">
-                                    <XCircle className="w-3 h-3" />
-                                    Cancelada
+                                    <Ban className="w-3 h-3" />
+                                    Revocada
+                                  </Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                {inv.access_expires_at ? (
+                                  <Badge variant="outline" className="gap-1 text-yellow-600 border-yellow-300 bg-yellow-50">
+                                    <CalendarClock className="w-3 h-3" />
+                                    {format(new Date(inv.access_expires_at), 'dd/MM/yyyy')}
+                                  </Badge>
+                                ) : (
+                                  <Badge variant="outline" className="gap-1 text-green-600 border-green-300 bg-green-50">
+                                    <CheckCircle className="w-3 h-3" />
+                                    Permanente
                                   </Badge>
                                 )}
                               </TableCell>
@@ -474,42 +561,76 @@ export default function Admin() {
                                 {format(new Date(inv.created_at), 'dd MMM yyyy', { locale: es })}
                               </TableCell>
                               <TableCell className="text-right">
-                                {!inv.is_accepted && inv.is_active && (
-                                  <div className="flex justify-end gap-2">
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => handleResendInvitation(inv.email, inv.id)}
-                                      disabled={resendInvitation.isPending}
-                                    >
-                                      <RefreshCw className="w-4 h-4" />
-                                    </Button>
+                                <div className="flex justify-end gap-2">
+                                  {!inv.is_accepted && inv.is_active && (
+                                    <>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => handleResendInvitation(inv.email, inv.id)}
+                                        disabled={resendInvitation.isPending}
+                                        title="Reenviar invitación"
+                                      >
+                                        <RefreshCw className="w-4 h-4" />
+                                      </Button>
+                                      <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                          <Button variant="outline" size="sm" className="text-destructive" title="Cancelar invitación">
+                                            <Trash2 className="w-4 h-4" />
+                                          </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                          <AlertDialogHeader>
+                                            <AlertDialogTitle>¿Cancelar invitación?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                              Esto cancelará la invitación para {inv.email}. Podrás enviar una nueva invitación después.
+                                            </AlertDialogDescription>
+                                          </AlertDialogHeader>
+                                          <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                            <AlertDialogAction
+                                              onClick={() => handleDeleteInvitation(inv.id)}
+                                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                            >
+                                              Eliminar
+                                            </AlertDialogAction>
+                                          </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                      </AlertDialog>
+                                    </>
+                                  )}
+                                  {inv.is_accepted && inv.is_active && (
                                     <AlertDialog>
                                       <AlertDialogTrigger asChild>
-                                        <Button variant="outline" size="sm" className="text-destructive">
-                                          <Trash2 className="w-4 h-4" />
+                                        <Button 
+                                          variant="outline" 
+                                          size="sm" 
+                                          className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                                          title="Revocar acceso"
+                                        >
+                                          <Ban className="w-4 h-4" />
                                         </Button>
                                       </AlertDialogTrigger>
                                       <AlertDialogContent>
                                         <AlertDialogHeader>
-                                          <AlertDialogTitle>¿Cancelar invitación?</AlertDialogTitle>
+                                          <AlertDialogTitle>¿Revocar acceso?</AlertDialogTitle>
                                           <AlertDialogDescription>
-                                            Esto cancelará la invitación para {inv.email}. Podrás enviar una nueva invitación después.
+                                            Esto eliminará inmediatamente el acceso de {inv.email} a la aplicación. El usuario no podrá iniciar sesión hasta que lo reactives.
                                           </AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                           <AlertDialogCancel>Cancelar</AlertDialogCancel>
                                           <AlertDialogAction
-                                            onClick={() => handleDeleteInvitation(inv.id)}
+                                            onClick={() => handleRevokeFromInvitation(inv.email)}
                                             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                           >
-                                            Eliminar
+                                            Revocar acceso
                                           </AlertDialogAction>
                                         </AlertDialogFooter>
                                       </AlertDialogContent>
                                     </AlertDialog>
-                                  </div>
-                                )}
+                                  )}
+                                </div>
                               </TableCell>
                             </TableRow>
                           ))}

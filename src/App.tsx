@@ -15,15 +15,16 @@ import Reports from "./pages/Reports";
 import Tips from "./pages/Tips";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
+import AccessDenied from "./pages/AccessDenied";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, accessValid, checkingAccess } = useAuth();
 
-  if (loading) {
+  if (loading || checkingAccess) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -35,6 +36,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/" replace />;
   }
 
+  // If user exists but access is not valid (deleted or expired)
+  if (!accessValid) {
+    return <Navigate to="/access-denied" replace />;
+  }
+
   return <>{children}</>;
 }
 
@@ -42,6 +48,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
+      <Route path="/access-denied" element={<AccessDenied />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/income" element={<ProtectedRoute><Income /></ProtectedRoute>} />
       <Route path="/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
