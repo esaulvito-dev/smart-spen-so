@@ -2,7 +2,6 @@ import { Sidebar } from '@/components/dashboard/Sidebar';
 import { TransactionList } from '@/components/dashboard/TransactionList';
 import { AddTransactionDialog } from '@/components/dashboard/AddTransactionDialog';
 import { useTransactions } from '@/hooks/useTransactions';
-import { useProfile } from '@/hooks/useProfile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, Loader2 } from 'lucide-react';
 import { useMemo } from 'react';
@@ -10,7 +9,6 @@ import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export default function Income() {
-  const { data: profile } = useProfile();
   const now = new Date();
   const startDate = format(startOfMonth(now), 'yyyy-MM-dd');
   const endDate = format(endOfMonth(now), 'yyyy-MM-dd');
@@ -41,7 +39,7 @@ export default function Income() {
   }
 
   return (
-    <div className={`min-h-screen bg-background ${profile?.theme_color ? `theme-${profile.theme_color}` : ''}`}>
+    <div className="min-h-screen bg-background">
       <Sidebar />
       <main className="lg:pl-64 p-4 lg:p-8 pt-20 lg:pt-8">
         <div className="max-w-5xl mx-auto space-y-8">

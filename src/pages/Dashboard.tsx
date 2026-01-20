@@ -54,7 +54,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className={`min-h-screen bg-background ${profile?.theme_color ? `theme-${profile.theme_color}` : ''}`}>
+    <div className="min-h-screen bg-background">
       <Sidebar />
       <main className="lg:pl-64 p-4 lg:p-8 pt-20 lg:pt-8">
         <div className="max-w-7xl mx-auto space-y-8">
