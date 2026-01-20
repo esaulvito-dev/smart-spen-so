@@ -136,62 +136,25 @@ export function AuthForm() {
       {/* Overlay for better contrast */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70" />
 
-      <div className="relative z-10 flex flex-col lg:flex-row w-full">
-        {/* Left Side - Hero Content */}
-        <div className="flex-1 flex flex-col justify-center px-6 py-8 lg:px-12 xl:px-20">
-          {/* Logo and Title */}
-          <div className="mb-8 lg:mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 lg:w-14 lg:h-14 gradient-primary rounded-xl flex items-center justify-center shadow-glow">
-                <TrendingUp className="w-6 h-6 lg:w-7 lg:h-7 text-primary-foreground" />
-              </div>
-              <span className="text-2xl lg:text-3xl font-bold text-white">BudgetTrack</span>
-            </div>
-            
-            <h1 className="text-3xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight mb-4">
-              Toma el control de{' '}
-              <span className="text-gradient">tus finanzas</span>
-            </h1>
-            
-            <p className="text-lg lg:text-xl text-white/80 max-w-xl">
-              La herramienta profesional para gestionar tus gastos, planificar presupuestos 
-              y alcanzar tus metas de ahorro de manera inteligente.
-            </p>
+      <div className="relative z-10 flex flex-col items-center justify-center w-full px-4 py-8">
+        {/* Logo */}
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 lg:w-14 lg:h-14 gradient-primary rounded-xl flex items-center justify-center shadow-glow">
+            <TrendingUp className="w-6 h-6 lg:w-7 lg:h-7 text-primary-foreground" />
           </div>
-
-          {/* Features Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6 max-w-2xl">
-            {features.map((feature, index) => (
-              <div 
-                key={index}
-                className="flex items-start gap-3 p-3 lg:p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 hover:bg-white/15 transition-colors"
-              >
-                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center shrink-0">
-                  <feature.icon className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-white text-sm lg:text-base">{feature.title}</h3>
-                  <p className="text-white/70 text-xs lg:text-sm mt-0.5">{feature.description}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Trust Badge */}
-          <div className="mt-8 lg:mt-12 flex items-center gap-4 text-white/60 text-sm">
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4" />
-              <span>Datos 100% seguros</span>
-            </div>
-            <div className="w-1 h-1 rounded-full bg-white/40" />
-            <span>Sin anuncios</span>
-            <div className="w-1 h-1 rounded-full bg-white/40" />
-            <span>Soporte incluido</span>
-          </div>
+          <span className="text-2xl lg:text-3xl font-bold text-white">BudgetTrack</span>
         </div>
 
-        {/* Right Side - Auth Form */}
-        <div className="lg:w-[520px] xl:w-[560px] flex items-center justify-center p-4 lg:p-8 lg:-ml-12 xl:-ml-16">
+        {/* Tagline */}
+        <h1 className="text-2xl lg:text-4xl font-bold text-white text-center mb-2">
+          Toma el control de <span className="text-gradient">tus finanzas</span>
+        </h1>
+        <p className="text-white/80 text-center mb-8 max-w-md">
+          La herramienta profesional para gestionar tus gastos y alcanzar tus metas de ahorro.
+        </p>
+
+        {/* Auth Form - Centered */}
+        <div className="w-full max-w-md">
           <Card className="w-full max-w-md shadow-elevated animate-slide-up border-0 bg-card/95 backdrop-blur-md">
             <CardHeader className="text-center space-y-3 sm:space-y-4 pb-4 sm:pb-6">
               <div className="mx-auto w-12 h-12 sm:w-14 sm:h-14 gradient-primary rounded-xl sm:rounded-2xl flex items-center justify-center shadow-glow lg:hidden">
@@ -284,6 +247,18 @@ export function AuthForm() {
               </CardFooter>
             </form>
           </Card>
+        </div>
+
+        {/* Trust Badge */}
+        <div className="mt-8 flex items-center justify-center gap-4 text-white/60 text-sm flex-wrap">
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4" />
+            <span>Datos 100% seguros</span>
+          </div>
+          <div className="w-1 h-1 rounded-full bg-white/40" />
+          <span>Sin anuncios</span>
+          <div className="w-1 h-1 rounded-full bg-white/40" />
+          <span>Soporte incluido</span>
         </div>
       </div>
     </div>
