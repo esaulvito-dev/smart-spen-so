@@ -9,6 +9,9 @@ import Dashboard from "./pages/Dashboard";
 import Income from "./pages/Income";
 import Expenses from "./pages/Expenses";
 import Budgets from "./pages/Budgets";
+import Goals from "./pages/Goals";
+import Recurring from "./pages/Recurring";
+import Reports from "./pages/Reports";
 import Tips from "./pages/Tips";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -42,6 +45,9 @@ function AppRoutes() {
       <Route path="/income" element={<ProtectedRoute><Income /></ProtectedRoute>} />
       <Route path="/expenses" element={<ProtectedRoute><Expenses /></ProtectedRoute>} />
       <Route path="/budgets" element={<ProtectedRoute><Budgets /></ProtectedRoute>} />
+      <Route path="/goals" element={<ProtectedRoute><Goals /></ProtectedRoute>} />
+      <Route path="/recurring" element={<ProtectedRoute><Recurring /></ProtectedRoute>} />
+      <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
       <Route path="/tips" element={<ProtectedRoute><Tips /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />

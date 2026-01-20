@@ -77,6 +77,93 @@ export type Database = {
         }
         Relationships: []
       }
+      recurring_transactions: {
+        Row: {
+          amount: number
+          category: Database["public"]["Enums"]["transaction_category"]
+          created_at: string | null
+          description: string | null
+          frequency: string
+          id: string
+          is_active: boolean | null
+          next_due_date: string
+          start_date: string
+          type: Database["public"]["Enums"]["transaction_type"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category: Database["public"]["Enums"]["transaction_category"]
+          created_at?: string | null
+          description?: string | null
+          frequency: string
+          id?: string
+          is_active?: boolean | null
+          next_due_date?: string
+          start_date?: string
+          type: Database["public"]["Enums"]["transaction_type"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: Database["public"]["Enums"]["transaction_category"]
+          created_at?: string | null
+          description?: string | null
+          frequency?: string
+          id?: string
+          is_active?: boolean | null
+          next_due_date?: string
+          start_date?: string
+          type?: Database["public"]["Enums"]["transaction_type"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      savings_goals: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          current_amount: number
+          deadline: string | null
+          icon: string | null
+          id: string
+          is_completed: boolean | null
+          name: string
+          target_amount: number
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          current_amount?: number
+          deadline?: string | null
+          icon?: string | null
+          id?: string
+          is_completed?: boolean | null
+          name: string
+          target_amount: number
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          current_amount?: number
+          deadline?: string | null
+          icon?: string | null
+          id?: string
+          is_completed?: boolean | null
+          name?: string
+          target_amount?: number
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       transactions: {
         Row: {
           amount: number
