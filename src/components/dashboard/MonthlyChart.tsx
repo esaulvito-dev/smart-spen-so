@@ -53,10 +53,10 @@ export function MonthlyChart({ transactions }: MonthlyChartProps) {
           <YAxis 
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
-            tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+            tickFormatter={(value) => `S/ ${(value / 1000).toFixed(0)}k`}
           />
           <Tooltip 
-            formatter={(value: number) => [`$${value.toLocaleString('es-MX', { minimumFractionDigits: 2 })}`, '']}
+            formatter={(value: number) => [`S/ ${value.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`, '']}
             contentStyle={{ 
               backgroundColor: 'hsl(var(--card))', 
               border: '1px solid hsl(var(--border))',

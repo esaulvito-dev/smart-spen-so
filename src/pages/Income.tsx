@@ -66,7 +66,7 @@ export default function Income() {
                 <div className="min-w-0">
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">Ingresos de {currentMonth}</p>
                   <p className="text-2xl sm:text-3xl font-bold text-success">
-                    +${monthlyIncome.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                    +S/ {monthlyIncome.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                 </div>
                 <div className="w-12 h-12 sm:w-16 sm:h-16 gradient-income rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">

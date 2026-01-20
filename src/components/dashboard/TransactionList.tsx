@@ -64,7 +64,7 @@ export function TransactionList({ transactions, showDelete = false }: Transactio
               'font-semibold text-sm sm:text-base',
               transaction.type === 'income' ? 'text-success' : 'text-destructive'
             )}>
-              {transaction.type === 'income' ? '+' : '-'}${transaction.amount.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+              {transaction.type === 'income' ? '+' : '-'}S/ {transaction.amount.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </p>
           </div>
 

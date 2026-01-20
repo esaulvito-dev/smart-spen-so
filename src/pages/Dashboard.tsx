@@ -37,7 +37,7 @@ export default function Dashboard() {
   }, [monthTransactions]);
 
   const formatCurrency = (amount: number) => {
-    return `$${Math.abs(amount).toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+    return `S/ ${Math.abs(amount).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   const currentMonth = format(now, "MMMM yyyy", { locale: es });
