@@ -1,21 +1,10 @@
 import { Sidebar } from '@/components/dashboard/Sidebar';
-import { useProfile } from '@/hooks/useProfile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PiggyBank, Loader2 } from 'lucide-react';
 
 export default function Budgets() {
-  const { data: profile, isLoading } = useProfile();
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   return (
-    <div className={`min-h-screen bg-background ${profile?.theme_color ? `theme-${profile.theme_color}` : ''}`}>
+    <div className="min-h-screen bg-background">
       <Sidebar />
       <main className="lg:pl-64 p-4 lg:p-8 pt-20 lg:pt-8">
         <div className="max-w-5xl mx-auto space-y-8">

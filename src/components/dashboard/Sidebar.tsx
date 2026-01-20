@@ -15,7 +15,7 @@ import {
   Menu,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
@@ -31,6 +31,20 @@ export function Sidebar() {
   const { signOut, user } = useAuth();
   const { data: profile } = useProfile();
   const [isOpen, setIsOpen] = useState(false);
+
+  // Apply theme color to document
+  useEffect(() => {
+    const themeColor = profile?.theme_color || 'emerald';
+    const root = document.documentElement;
+    
+    // Remove all theme classes
+    root.classList.remove('theme-emerald', 'theme-blue', 'theme-purple', 'theme-orange', 'theme-teal');
+    
+    // Add current theme class if not default
+    if (themeColor !== 'emerald') {
+      root.classList.add(`theme-${themeColor}`);
+    }
+  }, [profile?.theme_color]);
 
   const getInitials = (name: string | null | undefined) => {
     if (!name) return user?.email?.charAt(0).toUpperCase() || 'U';
