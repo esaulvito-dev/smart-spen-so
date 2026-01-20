@@ -125,7 +125,7 @@ export default function Dashboard() {
               <CardTitle className="text-base sm:text-lg">Transacciones recientes</CardTitle>
             </CardHeader>
             <CardContent className="px-3 sm:px-6">
-              <TransactionList transactions={allTransactions.slice(0, 10)} />
+              <TransactionList transactions={allTransactions.slice(0, 10)} showEdit />
             </CardContent>
           </Card>
         </div>
