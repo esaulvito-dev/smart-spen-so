@@ -249,8 +249,23 @@ export function AuthForm() {
           </Card>
         </div>
 
+        {/* Features Grid */}
+        <div className="mt-8 grid grid-cols-2 sm:grid-cols-3 gap-3 max-w-2xl w-full">
+          {features.map((feature, index) => (
+            <div 
+              key={index}
+              className="flex flex-col items-center text-center p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 hover:bg-white/15 transition-colors"
+            >
+              <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center mb-2">
+                <feature.icon className="w-5 h-5 text-primary" />
+              </div>
+              <h3 className="font-semibold text-white text-xs sm:text-sm">{feature.title}</h3>
+            </div>
+          ))}
+        </div>
+
         {/* Trust Badge */}
-        <div className="mt-8 flex items-center justify-center gap-4 text-white/60 text-sm flex-wrap">
+        <div className="mt-6 flex items-center justify-center gap-4 text-white/60 text-sm flex-wrap">
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4" />
             <span>Datos 100% seguros</span>
