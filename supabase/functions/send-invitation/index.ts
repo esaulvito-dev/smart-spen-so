@@ -34,7 +34,7 @@ const handler = async (req: Request): Promise<Response> => {
     const signupUrl = `${appUrl}`;
 
     const emailResponse = await resend.emails.send({
-      from: "BudgetTrack <onboarding@resend.dev>",
+      from: "BudgetTrack <hola@budgettrack.site>",
       to: [email],
       subject: "Has sido invitado a BudgetTrack",
       html: `
