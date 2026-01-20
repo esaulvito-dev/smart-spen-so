@@ -10,6 +10,7 @@ export interface UserWithRole {
   role: 'admin' | 'user';
   created_at: string;
   is_active: boolean;
+  expires_at: string | null;
 }
 
 export interface Invitation {
@@ -53,7 +54,7 @@ export function useUsers() {
       // Get all user roles
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
-        .select('user_id, role, created_at');
+        .select('user_id, role, created_at, expires_at');
       
       if (rolesError) throw rolesError;
       
@@ -67,6 +68,7 @@ export function useUsers() {
       // Combine data
       const users: UserWithRole[] = (roles || []).map((role) => {
         const profile = profiles?.find(p => p.id === role.user_id);
+        const isExpired = role.expires_at ? new Date(role.expires_at) < new Date() : false;
         return {
           id: role.user_id,
           email: profile?.email || 'Sin email',
@@ -74,7 +76,8 @@ export function useUsers() {
           avatar_url: profile?.avatar_url,
           role: role.role as 'admin' | 'user',
           created_at: role.created_at,
-          is_active: true,
+          is_active: !isExpired,
+          expires_at: role.expires_at,
         };
       });
       
@@ -157,6 +160,24 @@ export function useToggleUserAccess() {
         
         if (error) throw error;
       }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+    },
+  });
+}
+
+export function useSetUserExpiration() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ userId, expiresAt }: { userId: string; expiresAt: string | null }) => {
+      const { error } = await supabase
+        .from('user_roles')
+        .update({ expires_at: expiresAt })
+        .eq('user_id', userId);
+      
+      if (error) throw error;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-users'] });

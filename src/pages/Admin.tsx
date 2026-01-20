@@ -35,7 +35,9 @@ import {
   useDeleteUser,
   useDeleteInvitation,
   useResendInvitation,
+  useSetUserExpiration,
 } from '@/hooks/useUserManagement';
+import { SetExpirationDialog } from '@/components/dashboard/SetExpirationDialog';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   Users,
@@ -49,6 +51,7 @@ import {
   Clock,
   CheckCircle,
   XCircle,
+  CalendarClock,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -65,6 +68,7 @@ export default function Admin() {
   const deleteUser = useDeleteUser();
   const deleteInvitation = useDeleteInvitation();
   const resendInvitation = useResendInvitation();
+  const setUserExpiration = useSetUserExpiration();
   
   const [newEmail, setNewEmail] = useState('');
 
@@ -133,6 +137,19 @@ export default function Admin() {
     }
   };
 
+  const handleSetExpiration = async (userId: string, expiresAt: string | null, email: string) => {
+    try {
+      await setUserExpiration.mutateAsync({ userId, expiresAt });
+      if (expiresAt) {
+        toast.success(`Acceso temporal configurado para ${email}`);
+      } else {
+        toast.success(`Acceso permanente configurado para ${email}`);
+      }
+    } catch (error) {
+      toast.error('Error al configurar el acceso');
+    }
+  };
+
   const getInitials = (name: string | null, email: string) => {
     if (name) {
       return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -141,6 +158,7 @@ export default function Admin() {
   };
 
   const activeUsers = users?.filter(u => u.is_active) || [];
+  const expiredUsers = users?.filter(u => !u.is_active) || [];
   const pendingInvitations = invitations?.filter(i => !i.is_accepted && i.is_active) || [];
   const acceptedInvitations = invitations?.filter(i => i.is_accepted) || [];
 
@@ -260,7 +278,7 @@ export default function Admin() {
             <TabsList>
               <TabsTrigger value="users" className="gap-2">
                 <Users className="w-4 h-4" />
-                Usuarios ({activeUsers.length})
+                Usuarios ({users?.length || 0})
               </TabsTrigger>
               <TabsTrigger value="invitations" className="gap-2">
                 <Mail className="w-4 h-4" />
@@ -271,9 +289,9 @@ export default function Admin() {
             <TabsContent value="users">
               <Card>
                 <CardHeader>
-                  <CardTitle>Usuarios con acceso</CardTitle>
+                  <CardTitle>Gestión de usuarios</CardTitle>
                   <CardDescription>
-                    Lista de todos los usuarios que tienen acceso a la aplicación
+                    {activeUsers.length} activos · {expiredUsers.length} expirados
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -292,13 +310,14 @@ export default function Admin() {
                           <TableRow>
                             <TableHead>Usuario</TableHead>
                             <TableHead>Rol</TableHead>
+                            <TableHead>Acceso</TableHead>
                             <TableHead>Desde</TableHead>
                             <TableHead className="text-right">Acciones</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {activeUsers.map((u) => (
-                            <TableRow key={u.id}>
+                          {users?.map((u) => (
+                            <TableRow key={u.id} className={!u.is_active ? 'opacity-60' : ''}>
                               <TableCell>
                                 <div className="flex items-center gap-3">
                                   <Avatar className="w-8 h-8">
@@ -318,16 +337,46 @@ export default function Admin() {
                                   {u.role === 'admin' ? 'Admin' : 'Usuario'}
                                 </Badge>
                               </TableCell>
+                              <TableCell>
+                                {u.expires_at ? (
+                                  <div className="flex items-center gap-1">
+                                    {u.is_active ? (
+                                      <Badge variant="outline" className="gap-1 text-yellow-600 border-yellow-300 bg-yellow-50">
+                                        <CalendarClock className="w-3 h-3" />
+                                        Hasta {format(new Date(u.expires_at), 'dd/MM/yy')}
+                                      </Badge>
+                                    ) : (
+                                      <Badge variant="outline" className="gap-1 text-destructive border-destructive/30 bg-destructive/10">
+                                        <XCircle className="w-3 h-3" />
+                                        Expirado
+                                      </Badge>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <Badge variant="outline" className="gap-1 text-green-600 border-green-300 bg-green-50">
+                                    <CheckCircle className="w-3 h-3" />
+                                    Permanente
+                                  </Badge>
+                                )}
+                              </TableCell>
                               <TableCell className="text-muted-foreground text-sm">
                                 {format(new Date(u.created_at), 'dd MMM yyyy', { locale: es })}
                               </TableCell>
                               <TableCell className="text-right">
                                 {u.id !== user?.id && u.role !== 'admin' && (
                                   <div className="flex justify-end gap-2">
+                                    <SetExpirationDialog
+                                      userName={u.full_name || ''}
+                                      userEmail={u.email}
+                                      currentExpiration={u.expires_at}
+                                      onSetExpiration={(expiresAt) => handleSetExpiration(u.id, expiresAt, u.email)}
+                                      isPending={setUserExpiration.isPending}
+                                    />
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       onClick={() => handleToggleAccess(u.id, u.is_active, u.email)}
+                                      title={u.is_active ? 'Quitar acceso' : 'Restaurar acceso'}
                                     >
                                       <Power className="w-4 h-4" />
                                     </Button>

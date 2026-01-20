@@ -236,18 +236,21 @@ export type Database = {
       user_roles: {
         Row: {
           created_at: string | null
+          expires_at: string | null
           id: string
           role: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Insert: {
           created_at?: string | null
+          expires_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id: string
         }
         Update: {
           created_at?: string | null
+          expires_at?: string | null
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
@@ -267,6 +270,7 @@ export type Database = {
         Returns: boolean
       }
       is_email_invited: { Args: { _email: string }; Returns: boolean }
+      is_user_access_valid: { Args: { _user_id: string }; Returns: boolean }
       is_user_active: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
