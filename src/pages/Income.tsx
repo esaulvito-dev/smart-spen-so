@@ -82,7 +82,7 @@ export default function Income() {
               <CardTitle className="text-base sm:text-lg">Historial de ingresos</CardTitle>
             </CardHeader>
             <CardContent className="px-3 sm:px-6">
-              <TransactionList transactions={incomeTransactions} showDelete />
+              <TransactionList transactions={incomeTransactions} showDelete showEdit />
             </CardContent>
           </Card>
         </div>
