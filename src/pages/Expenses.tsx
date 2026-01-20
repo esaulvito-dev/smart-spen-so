@@ -41,7 +41,7 @@ export default function Expenses() {
       .slice(0, 5);
   }, [monthTransactions]);
 
-  const currentMonth = format(now, "MMMM 'de' yyyy", { locale: es });
+  const currentMonth = format(now, "MMMM yyyy", { locale: es });
 
   if (isLoading) {
     return (
@@ -52,38 +52,38 @@ export default function Expenses() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen min-h-[100dvh] bg-background">
       <Sidebar />
-      <main className="lg:pl-64 p-4 lg:p-8 pt-20 lg:pt-8">
-        <div className="max-w-5xl mx-auto space-y-8">
+      <main className="lg:pl-64 p-3 sm:p-4 lg:p-8 pt-[72px] lg:pt-8 pb-6">
+        <div className="max-w-5xl mx-auto space-y-4 sm:space-y-6 lg:space-y-8">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl lg:text-3xl font-bold flex items-center gap-3">
-                <div className="w-10 h-10 gradient-expense rounded-xl flex items-center justify-center">
-                  <TrendingDown className="w-5 h-5 text-primary-foreground" />
-                </div>
-                Gastos
-              </h1>
-              <p className="text-muted-foreground mt-1">
-                Controla todos tus gastos
-              </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 gradient-expense rounded-lg sm:rounded-xl flex items-center justify-center shrink-0">
+                <TrendingDown className="w-4 h-4 sm:w-5 sm:h-5 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold">Gastos</h1>
+                <p className="text-sm text-muted-foreground hidden sm:block">
+                  Controla todos tus gastos
+                </p>
+              </div>
             </div>
             <AddTransactionDialog defaultType="expense" />
           </div>
 
           {/* Monthly Summary */}
           <Card className="shadow-soft border-border/50 border-l-4 border-l-destructive">
-            <CardContent className="pt-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Gastos de {currentMonth}</p>
-                  <p className="text-3xl font-bold text-destructive">
-                    -${monthlyExpenses.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm text-muted-foreground truncate">Gastos de {currentMonth}</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-destructive">
+                    -${monthlyExpenses.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                   </p>
                 </div>
-                <div className="w-16 h-16 gradient-expense rounded-2xl flex items-center justify-center">
-                  <TrendingDown className="w-8 h-8 text-primary-foreground" />
+                <div className="w-12 h-12 sm:w-16 sm:h-16 gradient-expense rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
+                  <TrendingDown className="w-6 h-6 sm:w-8 sm:h-8 text-primary-foreground" />
                 </div>
               </div>
             </CardContent>
@@ -92,22 +92,22 @@ export default function Expenses() {
           {/* Top Categories */}
           {expensesByCategory.length > 0 && (
             <Card className="shadow-soft border-border/50">
-              <CardHeader>
-                <CardTitle className="text-lg">Top categorías del mes</CardTitle>
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-base sm:text-lg">Top categorías</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
+              <CardContent className="px-3 sm:px-6">
+                <div className="space-y-3 sm:space-y-4">
                   {expensesByCategory.map(([category, amount]) => {
                     const percentage = (amount / monthlyExpenses) * 100;
                     return (
-                      <div key={category} className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">{CATEGORY_ICONS[category as TransactionCategory]}</span>
-                            <span className="font-medium">{CATEGORY_LABELS[category as TransactionCategory]}</span>
+                      <div key={category} className="space-y-1.5 sm:space-y-2">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-base sm:text-lg">{CATEGORY_ICONS[category as TransactionCategory]}</span>
+                            <span className="font-medium text-sm sm:text-base truncate">{CATEGORY_LABELS[category as TransactionCategory]}</span>
                           </div>
-                          <span className="font-semibold">
-                            ${amount.toLocaleString('es-MX', { minimumFractionDigits: 2 })}
+                          <span className="font-semibold text-sm sm:text-base shrink-0">
+                            ${amount.toLocaleString('es-MX', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                           </span>
                         </div>
                         <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
@@ -126,10 +126,10 @@ export default function Expenses() {
 
           {/* Transaction List */}
           <Card className="shadow-soft border-border/50">
-            <CardHeader>
-              <CardTitle className="text-lg">Historial de gastos</CardTitle>
+            <CardHeader className="pb-2 sm:pb-4">
+              <CardTitle className="text-base sm:text-lg">Historial de gastos</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 sm:px-6">
               <TransactionList transactions={expenseTransactions} showDelete />
             </CardContent>
           </Card>

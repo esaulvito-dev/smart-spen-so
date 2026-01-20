@@ -70,15 +70,16 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="gradient-primary text-primary-foreground hover:opacity-90">
-          <Plus className="w-4 h-4 mr-2" />
-          Nueva transacción
+        <Button className="gradient-primary text-primary-foreground hover:opacity-90 active:scale-[0.98] h-10 sm:h-9 px-3 sm:px-4 text-sm">
+          <Plus className="w-4 h-4 mr-1.5 sm:mr-2" />
+          <span className="hidden sm:inline">Nueva transacción</span>
+          <span className="sm:hidden">Nuevo</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto">
         <DialogHeader>
-          <DialogTitle>Nueva transacción</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg sm:text-xl">Nueva transacción</DialogTitle>
+          <DialogDescription className="text-sm">
             Registra un nuevo ingreso o gasto en tu cuenta.
           </DialogDescription>
         </DialogHeader>
@@ -88,7 +89,10 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
             <Button
               type="button"
               variant={type === 'expense' ? 'default' : 'outline'}
-              className={type === 'expense' ? 'gradient-expense text-primary-foreground' : ''}
+              className={cn(
+                'h-11 sm:h-10 text-sm active:scale-[0.98]',
+                type === 'expense' ? 'gradient-expense text-primary-foreground' : ''
+              )}
               onClick={() => setType('expense')}
             >
               Gasto
@@ -96,15 +100,18 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
             <Button
               type="button"
               variant={type === 'income' ? 'default' : 'outline'}
-              className={type === 'income' ? 'gradient-income text-primary-foreground' : ''}
+              className={cn(
+                'h-11 sm:h-10 text-sm active:scale-[0.98]',
+                type === 'income' ? 'gradient-income text-primary-foreground' : ''
+              )}
               onClick={() => setType('income')}
             >
               Ingreso
             </Button>
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="amount">Monto</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="amount" className="text-sm">Monto</Label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
               <Input
@@ -115,21 +122,21 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="pl-7"
+                className="pl-7 h-11 sm:h-10 text-base sm:text-sm"
                 required
               />
             </div>
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="category">Categoría</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="category" className="text-sm">Categoría</Label>
             <Select value={category} onValueChange={(v) => setCategory(v as TransactionCategory)}>
-              <SelectTrigger>
+              <SelectTrigger className="h-11 sm:h-10 text-base sm:text-sm">
                 <SelectValue placeholder="Selecciona una categoría" />
               </SelectTrigger>
               <SelectContent>
                 {(Object.keys(CATEGORY_LABELS) as TransactionCategory[]).map((cat) => (
-                  <SelectItem key={cat} value={cat}>
+                  <SelectItem key={cat} value={cat} className="text-sm py-2.5 sm:py-2">
                     {CATEGORY_LABELS[cat]}
                   </SelectItem>
                 ))}
@@ -137,33 +144,44 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
             </Select>
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="date">Fecha</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="date" className="text-sm">Fecha</Label>
             <Input
               id="date"
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
+              className="h-11 sm:h-10 text-base sm:text-sm"
               required
             />
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="description">Descripción (opcional)</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="description" className="text-sm">Descripción (opcional)</Label>
             <Textarea
               id="description"
               placeholder="Ej: Pago de luz del mes..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
+              className="text-base sm:text-sm resize-none"
             />
           </div>
           
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+          <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0 pt-2">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => setOpen(false)}
+              className="w-full sm:w-auto h-11 sm:h-10 order-2 sm:order-1"
+            >
               Cancelar
             </Button>
-            <Button type="submit" disabled={createTransaction.isPending}>
+            <Button 
+              type="submit" 
+              disabled={createTransaction.isPending}
+              className="w-full sm:w-auto h-11 sm:h-10 order-1 sm:order-2"
+            >
               {createTransaction.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Guardar
             </Button>
@@ -172,4 +190,8 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
       </DialogContent>
     </Dialog>
   );
+}
+
+function cn(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(' ');
 }
