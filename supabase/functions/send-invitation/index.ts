@@ -30,8 +30,8 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    // URL de la aplicación publicada
-    const signupUrl = "https://smart-spen-so.lovable.app";
+    // URL de la aplicación con dominio personalizado
+    const signupUrl = "https://budgettrack.site";
 
     const emailResponse = await resend.emails.send({
       from: "BudgetTrack <hola@budgettrack.site>",
