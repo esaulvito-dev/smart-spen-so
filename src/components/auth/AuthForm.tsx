@@ -64,7 +64,7 @@ export function AuthForm() {
             <TrendingUp className="w-8 h-8 text-primary-foreground" />
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold">FinanzasPro</CardTitle>
+            <CardTitle className="text-2xl font-bold">BudgetTrack</CardTitle>
             <CardDescription className="text-base mt-2">
               {isLogin ? 'Inicia sesión en tu cuenta' : 'Crea tu cuenta gratuita'}
             </CardDescription>
