@@ -2,11 +2,19 @@ import { Sidebar } from '@/components/dashboard/Sidebar';
 import { TransactionList } from '@/components/dashboard/TransactionList';
 import { AddTransactionDialog } from '@/components/dashboard/AddTransactionDialog';
 import { useTransactions, CATEGORY_LABELS, CATEGORY_ICONS, TransactionCategory } from '@/hooks/useTransactions';
+import { useCustomCategories } from '@/hooks/useCustomCategories';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingDown, Loader2 } from 'lucide-react';
 import { useMemo } from 'react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { es } from 'date-fns/locale';
+
+// Extract custom category name from description
+const extractCustomCategory = (desc: string | null): string | null => {
+  if (!desc) return null;
+  const match = desc.match(/^\[([^\]]+)\]/);
+  return match ? match[1] : null;
+};
 
 export default function Expenses() {
   const now = new Date();
@@ -15,6 +23,7 @@ export default function Expenses() {
   
   const { data: allTransactions = [], isLoading } = useTransactions();
   const { data: monthTransactions = [] } = useTransactions(startDate, endDate);
+  const { data: customCategories = [] } = useCustomCategories();
 
   const expenseTransactions = useMemo(() => 
     allTransactions.filter((t) => t.type === 'expense'),
@@ -29,17 +38,40 @@ export default function Expenses() {
   );
 
   const expensesByCategory = useMemo(() => {
-    const grouped = monthTransactions
-      .filter((t) => t.type === 'expense')
-      .reduce((acc, t) => {
-        acc[t.category] = (acc[t.category] || 0) + Number(t.amount);
-        return acc;
-      }, {} as Record<string, number>);
+    const expenses = monthTransactions.filter((t) => t.type === 'expense');
+    
+    // Group by effective category (including custom)
+    const grouped = expenses.reduce((acc, t) => {
+      const customCatName = extractCustomCategory(t.description);
+      const effectiveCategory = customCatName || t.category;
+      
+      acc[effectiveCategory] = (acc[effectiveCategory] || 0) + Number(t.amount);
+      return acc;
+    }, {} as Record<string, number>);
     
     return Object.entries(grouped)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5);
   }, [monthTransactions]);
+
+  const getCategoryDisplay = (category: string) => {
+    // Check if it's a custom category
+    const customCat = customCategories.find(c => c.name === category);
+    if (customCat) {
+      return { icon: customCat.icon, label: customCat.name };
+    }
+    
+    // Check if it's a default category
+    if (CATEGORY_LABELS[category as TransactionCategory]) {
+      return { 
+        icon: CATEGORY_ICONS[category as TransactionCategory], 
+        label: CATEGORY_LABELS[category as TransactionCategory] 
+      };
+    }
+    
+    // Fallback for unknown categories
+    return { icon: '📋', label: category };
+  };
 
   const currentMonth = format(now, "MMMM yyyy", { locale: es });
 
@@ -99,12 +131,13 @@ export default function Expenses() {
                 <div className="space-y-3 sm:space-y-4">
                   {expensesByCategory.map(([category, amount]) => {
                     const percentage = (amount / monthlyExpenses) * 100;
+                    const { icon, label } = getCategoryDisplay(category);
                     return (
                       <div key={category} className="space-y-1.5 sm:space-y-2">
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-2 min-w-0">
-                            <span className="text-base sm:text-lg">{CATEGORY_ICONS[category as TransactionCategory]}</span>
-                            <span className="font-medium text-sm sm:text-base truncate">{CATEGORY_LABELS[category as TransactionCategory]}</span>
+                            <span className="text-base sm:text-lg">{icon}</span>
+                            <span className="font-medium text-sm sm:text-base truncate">{label}</span>
                           </div>
                           <span className="font-semibold text-sm sm:text-base shrink-0">
                             S/ {amount.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
