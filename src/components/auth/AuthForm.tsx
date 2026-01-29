@@ -155,7 +155,7 @@ export function AuthForm() {
 
         {/* Auth Form - Centered */}
         <div className="w-full max-w-md">
-          <Card className="w-full max-w-md shadow-elevated animate-slide-up border-0 bg-card/95 backdrop-blur-md">
+          <Card className="w-full max-w-md shadow-elevated border-0 bg-card/95 backdrop-blur-md">
             <CardHeader className="text-center space-y-3 sm:space-y-4 pb-4 sm:pb-6">
               <div className="mx-auto w-12 h-12 sm:w-14 sm:h-14 gradient-primary rounded-xl sm:rounded-2xl flex items-center justify-center shadow-glow lg:hidden">
                 <TrendingUp className="w-6 h-6 sm:w-7 sm:h-7 text-primary-foreground" />

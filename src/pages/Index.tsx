@@ -1,21 +1,20 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { AuthForm } from '@/components/auth/AuthForm';
 import { Navigate } from 'react-router-dom';
-import { Loader2 } from 'lucide-react';
 
 const Index = () => {
   const { user, loading } = useAuth();
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
+  // If user is already logged in, redirect immediately
   if (user) {
     return <Navigate to="/dashboard" replace />;
+  }
+
+  // Show AuthForm immediately - it handles its own loading state if needed
+  // Only show loader if we're still checking auth AND there might be a user session
+  if (loading) {
+    // Return AuthForm directly to avoid flash - it will redirect once auth resolves
+    return <AuthForm />;
   }
 
   return <AuthForm />;
