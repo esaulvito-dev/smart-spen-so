@@ -7,7 +7,9 @@ import { TransactionList } from '@/components/dashboard/TransactionList';
 import { ExpenseChart } from '@/components/dashboard/ExpenseChart';
 import { MonthlyChart } from '@/components/dashboard/MonthlyChart';
 import { AddTransactionDialog } from '@/components/dashboard/AddTransactionDialog';
+import { ExportReportDialog } from '@/components/dashboard/ExportReportDialog';
 import { useTransactions, CATEGORY_LABELS, CATEGORY_ICONS, TransactionCategory } from '@/hooks/useTransactions';
+import { useCustomCategories } from '@/hooks/useCustomCategories';
 import { useProfile } from '@/hooks/useProfile';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wallet, TrendingUp, TrendingDown, PiggyBank, Loader2 } from 'lucide-react';
@@ -16,11 +18,14 @@ import { Progress } from '@/components/ui/progress';
 export default function Dashboard() {
   const { data: profile } = useProfile();
   const now = new Date();
-  const startDate = format(startOfMonth(now), 'yyyy-MM-dd');
-  const endDate = format(endOfMonth(now), 'yyyy-MM-dd');
+  const monthStart = startOfMonth(now);
+  const monthEnd = endOfMonth(now);
+  const startDate = format(monthStart, 'yyyy-MM-dd');
+  const endDate = format(monthEnd, 'yyyy-MM-dd');
   
   const { data: allTransactions = [], isLoading } = useTransactions();
   const { data: monthTransactions = [] } = useTransactions(startDate, endDate);
+  const { data: customCategories = [] } = useCustomCategories();
 
   const stats = useMemo(() => {
     const totalIncome = monthTransactions
@@ -37,13 +42,37 @@ export default function Dashboard() {
     return { totalIncome, totalExpenses, balance, savingsRate };
   }, [monthTransactions]);
 
-  // Top income categories
+  // Extract custom category name from description
+  const extractCustomCategory = (desc: string | null): string | null => {
+    if (!desc) return null;
+    const match = desc.match(/^\[([^\]]+)\]/);
+    return match ? match[1] : null;
+  };
+
+  // Get category display info
+  const getCategoryDisplay = (category: string) => {
+    const customCat = customCategories.find(c => c.name === category);
+    if (customCat) {
+      return { icon: customCat.icon, label: customCat.name };
+    }
+    if (CATEGORY_LABELS[category as TransactionCategory]) {
+      return { 
+        icon: CATEGORY_ICONS[category as TransactionCategory], 
+        label: CATEGORY_LABELS[category as TransactionCategory] 
+      };
+    }
+    return { icon: '📋', label: category };
+  };
+
+  // Top income categories (with custom category support)
   const incomeByCategory = useMemo(() => {
     const grouped: Record<string, number> = {};
     monthTransactions
       .filter(t => t.type === 'income')
       .forEach(t => {
-        grouped[t.category] = (grouped[t.category] || 0) + Number(t.amount);
+        const customCatName = extractCustomCategory(t.description);
+        const effectiveCategory = customCatName || t.category;
+        grouped[effectiveCategory] = (grouped[effectiveCategory] || 0) + Number(t.amount);
       });
     
     return Object.entries(grouped)
@@ -52,13 +81,15 @@ export default function Dashboard() {
       .slice(0, 3);
   }, [monthTransactions]);
 
-  // Top expense categories
+  // Top expense categories (with custom category support)
   const expensesByCategory = useMemo(() => {
     const grouped: Record<string, number> = {};
     monthTransactions
       .filter(t => t.type === 'expense')
       .forEach(t => {
-        grouped[t.category] = (grouped[t.category] || 0) + Number(t.amount);
+        const customCatName = extractCustomCategory(t.description);
+        const effectiveCategory = customCatName || t.category;
+        grouped[effectiveCategory] = (grouped[effectiveCategory] || 0) + Number(t.amount);
       });
     
     return Object.entries(grouped)
@@ -108,7 +139,15 @@ export default function Dashboard() {
                 Resumen de {currentMonth}
               </p>
             </div>
-            <AddTransactionDialog />
+            <div className="flex gap-2">
+              <ExportReportDialog 
+                transactions={monthTransactions}
+                periodLabel={currentMonth}
+                startDate={monthStart}
+                endDate={monthEnd}
+              />
+              <AddTransactionDialog />
+            </div>
           </div>
 
           {/* Stats Grid */}
@@ -164,12 +203,13 @@ export default function Dashboard() {
                     <p className="text-xs text-muted-foreground font-medium">Top categorías</p>
                     {incomeByCategory.map(({ category, amount }) => {
                       const percentage = stats.totalIncome > 0 ? (amount / stats.totalIncome) * 100 : 0;
+                      const { icon, label } = getCategoryDisplay(category);
                       return (
                         <div key={category} className="space-y-1">
                           <div className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-2">
-                              <span>{CATEGORY_ICONS[category as TransactionCategory]}</span>
-                              <span className="font-medium">{CATEGORY_LABELS[category as TransactionCategory]}</span>
+                              <span>{icon}</span>
+                              <span className="font-medium">{label}</span>
                             </div>
                             <span className="text-success font-medium">
                               S/ {amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
@@ -218,12 +258,13 @@ export default function Dashboard() {
                     <p className="text-xs text-muted-foreground font-medium">Top categorías</p>
                     {expensesByCategory.map(({ category, amount }) => {
                       const percentage = stats.totalExpenses > 0 ? (amount / stats.totalExpenses) * 100 : 0;
+                      const { icon, label } = getCategoryDisplay(category);
                       return (
                         <div key={category} className="space-y-1">
                           <div className="flex items-center justify-between text-sm">
                             <div className="flex items-center gap-2">
-                              <span>{CATEGORY_ICONS[category as TransactionCategory]}</span>
-                              <span className="font-medium">{CATEGORY_LABELS[category as TransactionCategory]}</span>
+                              <span>{icon}</span>
+                              <span className="font-medium">{label}</span>
                             </div>
                             <span className="text-destructive font-medium">
                               S/ {amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
