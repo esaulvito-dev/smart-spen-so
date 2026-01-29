@@ -1,14 +1,17 @@
-import { useState } from 'react';
-import { useCreateTransaction, TransactionType, TransactionCategory, CATEGORY_LABELS } from '@/hooks/useTransactions';
+import { useState, useMemo } from 'react';
+import { useCreateTransaction, TransactionType, TransactionCategory, CATEGORY_LABELS, CATEGORY_ICONS } from '@/hooks/useTransactions';
+import { useCustomCategories } from '@/hooks/useCustomCategories';
+import { AddCustomCategoryDialog } from './AddCustomCategoryDialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface AddTransactionDialogProps {
   defaultType?: TransactionType;
@@ -17,13 +20,26 @@ interface AddTransactionDialogProps {
 export function AddTransactionDialog({ defaultType = 'expense' }: AddTransactionDialogProps) {
   const [open, setOpen] = useState(false);
   const [type, setType] = useState<TransactionType>(defaultType);
-  const [category, setCategory] = useState<TransactionCategory>('otros');
+  const [category, setCategory] = useState<string>('otros');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   
   const createTransaction = useCreateTransaction();
+  const { data: customCategories = [] } = useCustomCategories();
   const { toast } = useToast();
+
+  // Filter custom categories based on transaction type
+  const filteredCustomCategories = useMemo(() => {
+    return customCategories.filter(cat => 
+      cat.type === 'both' || cat.type === type
+    );
+  }, [customCategories, type]);
+
+  // Check if current category is a custom one
+  const isCustomCategory = useMemo(() => {
+    return customCategories.some(cat => cat.id === category);
+  }, [customCategories, category]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,12 +54,20 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
       return;
     }
 
+    // Determine if it's a default category or custom
+    const isDefaultCategory = Object.keys(CATEGORY_LABELS).includes(category);
+    const finalCategory = isDefaultCategory ? category as TransactionCategory : 'otros';
+    const customCat = customCategories.find(c => c.id === category);
+    const finalDescription = customCat 
+      ? `[${customCat.name}] ${description || ''}`.trim()
+      : description;
+
     try {
       await createTransaction.mutateAsync({
         type,
-        category,
+        category: finalCategory,
         amount: parsedAmount,
-        description: description || undefined,
+        description: finalDescription || undefined,
         date,
       });
       
@@ -65,6 +89,15 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
         variant: 'destructive',
       });
     }
+  };
+
+  // Get display value for select
+  const getCategoryDisplay = () => {
+    if (isCustomCategory) {
+      const customCat = customCategories.find(c => c.id === category);
+      return customCat ? `${customCat.icon} ${customCat.name}` : category;
+    }
+    return `${CATEGORY_ICONS[category as TransactionCategory] || ''} ${CATEGORY_LABELS[category as TransactionCategory] || category}`;
   };
 
   return (
@@ -130,16 +163,49 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
           
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="category" className="text-sm">Categoría</Label>
-            <Select value={category} onValueChange={(v) => setCategory(v as TransactionCategory)}>
+            <Select value={category} onValueChange={setCategory}>
               <SelectTrigger className="h-11 sm:h-10 text-base sm:text-sm">
-                <SelectValue placeholder="Selecciona una categoría" />
+                <SelectValue placeholder="Selecciona una categoría">
+                  {getCategoryDisplay()}
+                </SelectValue>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[300px]">
+                {/* Default categories */}
                 {(Object.keys(CATEGORY_LABELS) as TransactionCategory[]).map((cat) => (
                   <SelectItem key={cat} value={cat} className="text-sm py-2.5 sm:py-2">
-                    {CATEGORY_LABELS[cat]}
+                    <span className="flex items-center gap-2">
+                      <span>{CATEGORY_ICONS[cat]}</span>
+                      <span>{CATEGORY_LABELS[cat]}</span>
+                    </span>
                   </SelectItem>
                 ))}
+                
+                {/* Custom categories */}
+                {filteredCustomCategories.length > 0 && (
+                  <>
+                    <SelectSeparator />
+                    <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                      Personalizadas
+                    </div>
+                    {filteredCustomCategories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id} className="text-sm py-2.5 sm:py-2">
+                        <span className="flex items-center gap-2">
+                          <span>{cat.icon}</span>
+                          <span>{cat.name}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+                
+                {/* Add category button */}
+                <SelectSeparator />
+                <div className="p-1">
+                  <AddCustomCategoryDialog 
+                    defaultType={type}
+                    triggerClassName="w-full justify-start text-muted-foreground hover:text-foreground text-sm"
+                  />
+                </div>
               </SelectContent>
             </Select>
           </div>
@@ -190,8 +256,4 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
       </DialogContent>
     </Dialog>
   );
-}
-
-function cn(...classes: (string | boolean | undefined)[]) {
-  return classes.filter(Boolean).join(' ');
 }

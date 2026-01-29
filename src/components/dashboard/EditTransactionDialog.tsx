@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, SelectSeparator } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
 import { 
@@ -12,8 +12,11 @@ import {
   TransactionType, 
   TransactionCategory, 
   CATEGORY_LABELS, 
+  CATEGORY_ICONS,
   useUpdateTransaction 
 } from '@/hooks/useTransactions';
+import { useCustomCategories } from '@/hooks/useCustomCategories';
+import { AddCustomCategoryDialog } from './AddCustomCategoryDialog';
 
 interface EditTransactionDialogProps {
   transaction: Transaction | null;
@@ -21,30 +24,67 @@ interface EditTransactionDialogProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const categories: TransactionCategory[] = [
+const defaultCategories: TransactionCategory[] = [
   'hogar', 'negocio', 'trabajo', 'alimentacion', 'transporte',
   'entretenimiento', 'salud', 'educacion', 'servicios', 'otros'
 ];
 
 export function EditTransactionDialog({ transaction, open, onOpenChange }: EditTransactionDialogProps) {
   const [type, setType] = useState<TransactionType>('expense');
-  const [category, setCategory] = useState<TransactionCategory>('otros');
+  const [category, setCategory] = useState<string>('otros');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [date, setDate] = useState('');
   
   const updateTransaction = useUpdateTransaction();
+  const { data: customCategories = [] } = useCustomCategories();
   const { toast } = useToast();
+
+  // Filter custom categories based on transaction type
+  const filteredCustomCategories = useMemo(() => {
+    return customCategories.filter(cat => 
+      cat.type === 'both' || cat.type === type
+    );
+  }, [customCategories, type]);
+
+  // Check if current category is a custom one
+  const isCustomCategory = useMemo(() => {
+    return customCategories.some(cat => cat.id === category);
+  }, [customCategories, category]);
+
+  // Extract custom category from description if present
+  const extractCustomCategory = (desc: string | null) => {
+    if (!desc) return { customCatName: null, cleanDesc: '' };
+    const match = desc.match(/^\[([^\]]+)\]\s*/);
+    if (match) {
+      return { customCatName: match[1], cleanDesc: desc.replace(match[0], '') };
+    }
+    return { customCatName: null, cleanDesc: desc };
+  };
 
   useEffect(() => {
     if (transaction) {
       setType(transaction.type);
-      setCategory(transaction.category);
       setAmount(transaction.amount.toString());
-      setDescription(transaction.description || '');
       setDate(transaction.date);
+      
+      // Check if description contains a custom category marker
+      const { customCatName, cleanDesc } = extractCustomCategory(transaction.description);
+      
+      if (customCatName) {
+        // Find matching custom category
+        const matchingCat = customCategories.find(c => c.name === customCatName);
+        if (matchingCat) {
+          setCategory(matchingCat.id);
+          setDescription(cleanDesc);
+          return;
+        }
+      }
+      
+      setCategory(transaction.category);
+      setDescription(transaction.description || '');
     }
-  }, [transaction]);
+  }, [transaction, customCategories]);
 
   const handleSubmit = async () => {
     if (!transaction) return;
@@ -68,13 +108,21 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: EditT
       return;
     }
 
+    // Determine if it's a default category or custom
+    const isDefaultCategory = defaultCategories.includes(category as TransactionCategory);
+    const finalCategory = isDefaultCategory ? category as TransactionCategory : 'otros';
+    const customCat = customCategories.find(c => c.id === category);
+    const finalDescription = customCat 
+      ? `[${customCat.name}] ${description || ''}`.trim()
+      : description.trim() || null;
+
     try {
       await updateTransaction.mutateAsync({
         id: transaction.id,
         type,
-        category,
+        category: finalCategory,
         amount: parsedAmount,
-        description: description.trim() || null,
+        description: finalDescription,
         date,
       });
       
@@ -91,6 +139,15 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: EditT
         variant: 'destructive',
       });
     }
+  };
+
+  // Get display value for select
+  const getCategoryDisplay = () => {
+    if (isCustomCategory) {
+      const customCat = customCategories.find(c => c.id === category);
+      return customCat ? `${customCat.icon} ${customCat.name}` : category;
+    }
+    return `${CATEGORY_ICONS[category as TransactionCategory] || ''} ${CATEGORY_LABELS[category as TransactionCategory] || category}`;
   };
 
   return (
@@ -142,16 +199,49 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: EditT
           {/* Category */}
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="edit-category" className="text-sm">Categoría</Label>
-            <Select value={category} onValueChange={(value) => setCategory(value as TransactionCategory)}>
+            <Select value={category} onValueChange={setCategory}>
               <SelectTrigger className="h-11 sm:h-10 text-base sm:text-sm">
-                <SelectValue />
+                <SelectValue>
+                  {getCategoryDisplay()}
+                </SelectValue>
               </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
+              <SelectContent className="max-h-[300px]">
+                {/* Default categories */}
+                {defaultCategories.map((cat) => (
                   <SelectItem key={cat} value={cat} className="text-base sm:text-sm">
-                    {CATEGORY_LABELS[cat]}
+                    <span className="flex items-center gap-2">
+                      <span>{CATEGORY_ICONS[cat]}</span>
+                      <span>{CATEGORY_LABELS[cat]}</span>
+                    </span>
                   </SelectItem>
                 ))}
+                
+                {/* Custom categories */}
+                {filteredCustomCategories.length > 0 && (
+                  <>
+                    <SelectSeparator />
+                    <div className="px-2 py-1.5 text-xs font-medium text-muted-foreground">
+                      Personalizadas
+                    </div>
+                    {filteredCustomCategories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id} className="text-base sm:text-sm">
+                        <span className="flex items-center gap-2">
+                          <span>{cat.icon}</span>
+                          <span>{cat.name}</span>
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </>
+                )}
+                
+                {/* Add category button */}
+                <SelectSeparator />
+                <div className="p-1">
+                  <AddCustomCategoryDialog 
+                    defaultType={type}
+                    triggerClassName="w-full justify-start text-muted-foreground hover:text-foreground text-sm"
+                  />
+                </div>
               </SelectContent>
             </Select>
           </div>

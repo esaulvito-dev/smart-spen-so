@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
-import { Transaction, CATEGORY_LABELS, TransactionCategory } from '@/hooks/useTransactions';
+import { Transaction, CATEGORY_LABELS, TransactionCategory, CATEGORY_ICONS } from '@/hooks/useTransactions';
+import { useCustomCategories } from '@/hooks/useCustomCategories';
 
 interface ExpenseChartProps {
   transactions: Transaction[];
@@ -19,17 +20,46 @@ const COLORS = [
   'hsl(215, 16%, 47%)',  // Muted gray
 ];
 
+// Extract custom category name from description
+const extractCustomCategory = (desc: string | null): string | null => {
+  if (!desc) return null;
+  const match = desc.match(/^\[([^\]]+)\]/);
+  return match ? match[1] : null;
+};
+
 export function ExpenseChart({ transactions }: ExpenseChartProps) {
+  const { data: customCategories = [] } = useCustomCategories();
+
   const data = useMemo(() => {
     const expenses = transactions.filter((t) => t.type === 'expense');
+    
+    // Group by effective category (including custom)
     const grouped = expenses.reduce((acc, t) => {
-      const existing = acc.find((item) => item.category === t.category);
+      const customCatName = extractCustomCategory(t.description);
+      const effectiveCategory = customCatName || t.category;
+      const customCat = customCategories.find(c => c.name === customCatName);
+      
+      const existing = acc.find((item) => item.category === effectiveCategory);
       if (existing) {
         existing.value += Number(t.amount);
       } else {
+        let displayName: string;
+        let icon: string;
+        
+        if (customCat) {
+          displayName = customCat.name;
+          icon = customCat.icon;
+        } else if (customCatName) {
+          displayName = customCatName;
+          icon = '📋';
+        } else {
+          displayName = CATEGORY_LABELS[t.category as TransactionCategory] || t.category;
+          icon = CATEGORY_ICONS[t.category as TransactionCategory] || '📦';
+        }
+        
         acc.push({
-          category: t.category,
-          name: CATEGORY_LABELS[t.category as TransactionCategory],
+          category: effectiveCategory,
+          name: `${icon} ${displayName}`,
           value: Number(t.amount),
         });
       }
@@ -37,7 +67,7 @@ export function ExpenseChart({ transactions }: ExpenseChartProps) {
     }, [] as { category: string; name: string; value: number }[]);
     
     return grouped.sort((a, b) => b.value - a.value);
-  }, [transactions]);
+  }, [transactions, customCategories]);
 
   if (data.length === 0) {
     return (
