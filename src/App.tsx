@@ -13,6 +13,7 @@ import Goals from "./pages/Goals";
 import Recurring from "./pages/Recurring";
 import Reports from "./pages/Reports";
 import Tips from "./pages/Tips";
+import AIAdvisor from "./pages/AIAdvisor";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import AccessDenied from "./pages/AccessDenied";
@@ -57,6 +58,7 @@ function AppRoutes() {
       <Route path="/recurring" element={<ProtectedRoute><Recurring /></ProtectedRoute>} />
       <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
       <Route path="/tips" element={<ProtectedRoute><Tips /></ProtectedRoute>} />
+      <Route path="/ai-advisor" element={<ProtectedRoute><AIAdvisor /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
       <Route path="*" element={<NotFound />} />
