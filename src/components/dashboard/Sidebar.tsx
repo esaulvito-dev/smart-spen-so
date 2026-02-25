@@ -14,6 +14,7 @@ import {
   RefreshCw,
   FileText,
   Lightbulb,
+  Sparkles,
   Settings,
   LogOut,
   Menu,
@@ -31,6 +32,7 @@ const menuItems = [
   { icon: RefreshCw, label: 'Recurrentes', path: '/recurring' },
   { icon: FileText, label: 'Reportes', path: '/reports' },
   { icon: Lightbulb, label: 'Consejos', path: '/tips' },
+  { icon: Sparkles, label: 'IA de BudgetTrack', path: '/ai-advisor' },
   { icon: Settings, label: 'Configuración', path: '/settings' },
 ];
 
