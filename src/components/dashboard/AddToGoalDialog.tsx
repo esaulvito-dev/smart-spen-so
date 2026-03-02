@@ -20,7 +20,7 @@ export function AddToGoalDialog({ goal, open, onOpenChange }: AddToGoalDialogPro
   
   const updateGoal = useUpdateSavingsGoal();
   const { toast } = useToast();
-  const { symbol, formatCurrency } = useCurrency();
+  const { symbol, formatCurrency, convertToBase } = useCurrency();
 
   useEffect(() => {
     if (open) {
@@ -42,8 +42,9 @@ export function AddToGoalDialog({ goal, open, onOpenChange }: AddToGoalDialogPro
       return;
     }
 
+    const baseInput = convertToBase(parsedAmount);
     const currentAmount = Number(goal.current_amount);
-    let newAmount = isAdding ? currentAmount + parsedAmount : currentAmount - parsedAmount;
+    let newAmount = isAdding ? currentAmount + baseInput : currentAmount - baseInput;
     
     // Don't allow negative amounts
     if (newAmount < 0) newAmount = 0;

@@ -37,7 +37,7 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
   const { data: customCategories = [] } = useCustomCategories();
   const createCustomCategory = useCreateCustomCategory();
   const { toast } = useToast();
-  const { symbol, locale } = useCurrency();
+  const { symbol, locale, convertToBase } = useCurrency();
 
   // Filter custom categories based on transaction type
   const filteredCustomCategories = useMemo(() => {
@@ -123,11 +123,13 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
       ? `[${customCat.name}] ${description || ''}`.trim()
       : description;
 
+    const baseAmount = convertToBase(parsedAmount);
+
     try {
       await createTransaction.mutateAsync({
         type,
         category: finalCategory,
-        amount: parsedAmount,
+        amount: baseAmount,
         description: finalDescription || undefined,
         date,
       });

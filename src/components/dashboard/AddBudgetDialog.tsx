@@ -30,7 +30,7 @@ export function AddBudgetDialog({ existingCategories, editBudget, open, onOpenCh
   const createBudget = useCreateBudget();
   const updateBudget = useUpdateBudget();
   const { toast } = useToast();
-  const { symbol, locale } = useCurrency();
+  const { symbol, locale, convertAmount, convertToBase } = useCurrency();
 
   const isControlled = open !== undefined;
   const isOpen = isControlled ? open : internalOpen;
@@ -44,7 +44,7 @@ export function AddBudgetDialog({ existingCategories, editBudget, open, onOpenCh
   useEffect(() => {
     if (editBudget) {
       setCategory(editBudget.category);
-      setAmount(editBudget.amount.toString());
+      setAmount(convertAmount(Number(editBudget.amount)).toFixed(2));
     } else {
       setCategory('');
       setAmount('');
@@ -71,13 +71,15 @@ export function AddBudgetDialog({ existingCategories, editBudget, open, onOpenCh
       return;
     }
 
+    const baseAmount = convertToBase(parsedAmount);
+
     try {
       const now = new Date();
       
       if (isEditing && editBudget) {
         await updateBudget.mutateAsync({
           id: editBudget.id,
-          amount: parsedAmount,
+          amount: baseAmount,
         });
         toast({
           title: 'Presupuesto actualizado',
@@ -86,7 +88,7 @@ export function AddBudgetDialog({ existingCategories, editBudget, open, onOpenCh
       } else {
         await createBudget.mutateAsync({
           category: category as TransactionCategory,
-          amount: parsedAmount,
+          amount: baseAmount,
           month: now.getMonth() + 1,
           year: now.getFullYear(),
         });

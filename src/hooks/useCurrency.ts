@@ -46,6 +46,16 @@ export function useCurrency() {
     return amount / rate;
   };
 
+  /**
+   * Convert an amount from the display currency back to the base currency (PEN) for storage.
+   * If display currency is PEN, no conversion. If USD, multiply by rate.
+   */
+  const convertToBase = (amount: number): number => {
+    if (code === BASE_CURRENCY) return amount;
+    // USD -> PEN: multiply by rate
+    return amount * rate;
+  };
+
   const formatCurrency = (amount: number) => {
     const converted = convertAmount(Math.abs(amount));
     return `${config.symbol} ${converted.toLocaleString(config.locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -59,6 +69,7 @@ export function useCurrency() {
     currencyName: config.name,
     exchangeRate: rate,
     convertAmount,
+    convertToBase,
   };
 }
 
