@@ -7,6 +7,7 @@ import { Trash2, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { EditTransactionDialog } from './EditTransactionDialog';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface TransactionListProps {
   transactions: Transaction[];
@@ -19,6 +20,7 @@ export function TransactionList({ transactions, showDelete = false, showEdit = f
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const deleteTransaction = useDeleteTransaction();
   const { toast } = useToast();
+  const { formatCurrency } = useCurrency();
 
   const handleDelete = async (id: string) => {
     try {
@@ -75,7 +77,7 @@ export function TransactionList({ transactions, showDelete = false, showEdit = f
                 'font-semibold text-sm sm:text-base',
                 transaction.type === 'income' ? 'text-success' : 'text-destructive'
               )}>
-                {transaction.type === 'income' ? '+' : '-'}S/ {transaction.amount.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {transaction.type === 'income' ? '+' : '-'}{formatCurrency(Number(transaction.amount))}
               </p>
             </div>
 
