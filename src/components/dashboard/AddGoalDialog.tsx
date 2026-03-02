@@ -27,7 +27,7 @@ export function AddGoalDialog({ editGoal, open, onOpenChange }: AddGoalDialogPro
   const createGoal = useCreateSavingsGoal();
   const updateGoal = useUpdateSavingsGoal();
   const { toast } = useToast();
-  const { symbol } = useCurrency();
+  const { symbol, convertAmount, convertToBase } = useCurrency();
 
   const isControlled = open !== undefined;
   const isOpen = isControlled ? open : internalOpen;
@@ -38,8 +38,8 @@ export function AddGoalDialog({ editGoal, open, onOpenChange }: AddGoalDialogPro
   useEffect(() => {
     if (editGoal) {
       setName(editGoal.name);
-      setTargetAmount(editGoal.target_amount.toString());
-      setCurrentAmount(editGoal.current_amount.toString());
+      setTargetAmount(convertAmount(Number(editGoal.target_amount)).toFixed(2));
+      setCurrentAmount(convertAmount(Number(editGoal.current_amount)).toFixed(2));
       setDeadline(editGoal.deadline || '');
       setIcon(editGoal.icon);
     } else {
@@ -72,14 +72,16 @@ export function AddGoalDialog({ editGoal, open, onOpenChange }: AddGoalDialogPro
     }
 
     const parsedCurrent = parseFloat(currentAmount) || 0;
+    const baseTarget = convertToBase(parsedTarget);
+    const baseCurrent = convertToBase(parsedCurrent);
 
     try {
       if (isEditing && editGoal) {
         await updateGoal.mutateAsync({
           id: editGoal.id,
           name: name.trim(),
-          target_amount: parsedTarget,
-          current_amount: parsedCurrent,
+          target_amount: baseTarget,
+          current_amount: baseCurrent,
           deadline: deadline || null,
           icon,
         });
@@ -90,8 +92,8 @@ export function AddGoalDialog({ editGoal, open, onOpenChange }: AddGoalDialogPro
       } else {
         await createGoal.mutateAsync({
           name: name.trim(),
-          target_amount: parsedTarget,
-          current_amount: parsedCurrent,
+          target_amount: baseTarget,
+          current_amount: baseCurrent,
           deadline: deadline || null,
           icon,
         });

@@ -49,7 +49,7 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: EditT
   const { data: customCategories = [] } = useCustomCategories();
   const createCustomCategory = useCreateCustomCategory();
   const { toast } = useToast();
-  const { symbol, locale } = useCurrency();
+  const { symbol, locale, convertAmount, convertToBase } = useCurrency();
 
   // Filter custom categories based on transaction type
   const filteredCustomCategories = useMemo(() => {
@@ -76,7 +76,7 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: EditT
   useEffect(() => {
     if (transaction) {
       setType(transaction.type);
-      setAmount(transaction.amount.toString());
+      setAmount(convertAmount(Number(transaction.amount)).toFixed(2));
       setDate(transaction.date);
       
       // Check if description contains a custom category marker
@@ -178,12 +178,14 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: EditT
       ? `[${customCat.name}] ${description || ''}`.trim()
       : description.trim() || null;
 
+    const baseAmount = convertToBase(parsedAmount);
+
     try {
       await updateTransaction.mutateAsync({
         id: transaction.id,
         type,
         category: finalCategory,
-        amount: parsedAmount,
+        amount: baseAmount,
         description: finalDescription,
         date,
       });

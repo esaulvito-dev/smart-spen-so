@@ -42,7 +42,7 @@ export function AddRecurringDialog({ editRecurring, open, onOpenChange }: AddRec
   const createRecurring = useCreateRecurringTransaction();
   const updateRecurring = useUpdateRecurringTransaction();
   const { toast } = useToast();
-  const { symbol } = useCurrency();
+  const { symbol, convertAmount, convertToBase } = useCurrency();
 
   const isControlled = open !== undefined;
   const isOpen = isControlled ? open : internalOpen;
@@ -54,7 +54,7 @@ export function AddRecurringDialog({ editRecurring, open, onOpenChange }: AddRec
     if (editRecurring) {
       setType(editRecurring.type);
       setCategory(editRecurring.category);
-      setAmount(editRecurring.amount.toString());
+      setAmount(convertAmount(Number(editRecurring.amount)).toFixed(2));
       setDescription(editRecurring.description || '');
       setFrequency(editRecurring.frequency);
       setStartDate(editRecurring.next_due_date);
@@ -88,13 +88,15 @@ export function AddRecurringDialog({ editRecurring, open, onOpenChange }: AddRec
       return;
     }
 
+    const baseAmount = convertToBase(parsedAmount);
+
     try {
       if (isEditing && editRecurring) {
         await updateRecurring.mutateAsync({
           id: editRecurring.id,
           type,
           category,
-          amount: parsedAmount,
+          amount: baseAmount,
           description: description.trim() || null,
           frequency,
           next_due_date: startDate,
@@ -107,7 +109,7 @@ export function AddRecurringDialog({ editRecurring, open, onOpenChange }: AddRec
         await createRecurring.mutateAsync({
           type,
           category,
-          amount: parsedAmount,
+          amount: baseAmount,
           description: description.trim() || undefined,
           frequency,
           start_date: startDate,
