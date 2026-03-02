@@ -3,12 +3,15 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Transaction } from '@/hooks/useTransactions';
 import { format, startOfMonth, subMonths } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface MonthlyChartProps {
   transactions: Transaction[];
 }
 
 export function MonthlyChart({ transactions }: MonthlyChartProps) {
+  const { symbol, locale } = useCurrency();
+
   const data = useMemo(() => {
     const months = [];
     const now = new Date();
@@ -53,10 +56,10 @@ export function MonthlyChart({ transactions }: MonthlyChartProps) {
           <YAxis 
             stroke="hsl(var(--muted-foreground))"
             fontSize={12}
-            tickFormatter={(value) => `S/ ${(value / 1000).toFixed(0)}k`}
+            tickFormatter={(value) => `${symbol} ${(value / 1000).toFixed(0)}k`}
           />
           <Tooltip 
-            formatter={(value: number) => [`S/ ${value.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`, '']}
+            formatter={(value: number) => [`${symbol} ${value.toLocaleString(locale, { minimumFractionDigits: 2 })}`, '']}
             contentStyle={{ 
               backgroundColor: 'hsl(var(--card))', 
               border: '1px solid hsl(var(--border))',

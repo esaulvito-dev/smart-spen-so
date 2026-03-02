@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Plus, Minus } from 'lucide-react';
 import { useUpdateSavingsGoal, SavingsGoal } from '@/hooks/useSavingsGoals';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface AddToGoalDialogProps {
   goal: SavingsGoal | null;
@@ -19,6 +20,7 @@ export function AddToGoalDialog({ goal, open, onOpenChange }: AddToGoalDialogPro
   
   const updateGoal = useUpdateSavingsGoal();
   const { toast } = useToast();
+  const { symbol, formatCurrency } = useCurrency();
 
   useEffect(() => {
     if (open) {
@@ -54,7 +56,7 @@ export function AddToGoalDialog({ goal, open, onOpenChange }: AddToGoalDialogPro
       
       toast({
         title: isAdding ? 'Ahorro agregado' : 'Monto retirado',
-        description: `${isAdding ? 'Se agregaron' : 'Se retiraron'} S/ ${parsedAmount.toLocaleString('es-PE', { minimumFractionDigits: 2 })} ${isAdding ? 'a' : 'de'} "${goal.name}"`,
+        description: `${isAdding ? 'Se agregaron' : 'Se retiraron'} ${formatCurrency(parsedAmount)} ${isAdding ? 'a' : 'de'} "${goal.name}"`,
       });
       
       onOpenChange(false);
@@ -86,14 +88,14 @@ export function AddToGoalDialog({ goal, open, onOpenChange }: AddToGoalDialogPro
           <div className="p-3 bg-secondary rounded-lg text-center">
             <p className="text-xs text-muted-foreground">Progreso actual</p>
             <p className="text-lg font-bold">
-              S/ {Number(goal.current_amount).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+              {formatCurrency(Number(goal.current_amount))}
               <span className="text-muted-foreground font-normal text-sm">
-                {' '}/ S/ {Number(goal.target_amount).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                {' '}/ {formatCurrency(Number(goal.target_amount))}
               </span>
             </p>
             {remaining > 0 && (
               <p className="text-xs text-muted-foreground mt-1">
-                Te faltan S/ {remaining.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                Te faltan {formatCurrency(remaining)}
               </p>
             )}
           </div>
@@ -124,7 +126,7 @@ export function AddToGoalDialog({ goal, open, onOpenChange }: AddToGoalDialogPro
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="add-amount" className="text-sm">Monto</Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">S/</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{symbol}</span>
               <Input
                 id="add-amount"
                 type="number"

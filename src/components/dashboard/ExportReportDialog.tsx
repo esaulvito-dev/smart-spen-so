@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Download, FileSpreadsheet, FileText, Loader2 } from 'lucide-react';
 import { Transaction, CATEGORY_LABELS, CATEGORY_ICONS, TransactionCategory } from '@/hooks/useTransactions';
 import { useCustomCategories } from '@/hooks/useCustomCategories';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface ExportReportDialogProps {
   transactions: Transaction[];
@@ -40,6 +41,7 @@ export function ExportReportDialog({
   
   const { data: customCategories = [] } = useCustomCategories();
   const { toast } = useToast();
+  const { symbol } = useCurrency();
 
   const filteredTransactions = transactions.filter(t => {
     if (exportType === 'all') return true;
@@ -214,17 +216,17 @@ export function ExportReportDialog({
             ${exportType === 'all' || exportType === 'income' ? `
             <div class="stat-card">
               <p class="stat-label">Ingresos Totales</p>
-              <p class="stat-value income">+S/ ${stats.totalIncome.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+              <p class="stat-value income">+${symbol} ${stats.totalIncome.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
             </div>
             ` : ''}
             ${exportType === 'all' ? `
             <div class="stat-card">
               <p class="stat-label">Gastos Totales</p>
-              <p class="stat-value expense">-S/ ${stats.totalExpenses.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+              <p class="stat-value expense">-${symbol} ${stats.totalExpenses.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
             </div>
             <div class="stat-card">
               <p class="stat-label">Balance</p>
-              <p class="stat-value ${stats.balance >= 0 ? 'balance-positive' : 'balance-negative'}">S/ ${stats.balance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+              <p class="stat-value ${stats.balance >= 0 ? 'balance-positive' : 'balance-negative'}">${symbol} ${stats.balance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
             </div>
             ` : ''}
           </div>
@@ -232,7 +234,7 @@ export function ExportReportDialog({
           <div class="stats" style="grid-template-columns: repeat(1, 1fr); max-width: 300px;">
             <div class="stat-card">
               <p class="stat-label">Gastos Totales</p>
-              <p class="stat-value expense">-S/ ${stats.totalExpenses.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+              <p class="stat-value expense">-${symbol} ${stats.totalExpenses.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
             </div>
           </div>
           `}
@@ -257,7 +259,7 @@ export function ExportReportDialog({
                   <td>${icon} ${label}</td>
                   <td>${cleanDesc}</td>
                   <td style="text-align: right;" class="${t.type === 'income' ? 'amount-income' : 'amount-expense'}">
-                    ${t.type === 'income' ? '+' : '-'}S/ ${Number(t.amount).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                    ${t.type === 'income' ? '+' : '-'}${symbol} ${Number(t.amount).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
                   </td>
                 </tr>
               `;}).join('')}
@@ -300,13 +302,13 @@ export function ExportReportDialog({
     // Summary
     csvContent += 'RESUMEN\n';
     if (exportType === 'all' || exportType === 'income') {
-      csvContent += `Total Ingresos:,S/ ${stats.totalIncome.toLocaleString('es-PE', { minimumFractionDigits: 2 })}\n`;
+      csvContent += `Total Ingresos:,${symbol} ${stats.totalIncome.toLocaleString('es-PE', { minimumFractionDigits: 2 })}\n`;
     }
     if (exportType === 'all' || exportType === 'expense') {
-      csvContent += `Total Gastos:,S/ ${stats.totalExpenses.toLocaleString('es-PE', { minimumFractionDigits: 2 })}\n`;
+      csvContent += `Total Gastos:,${symbol} ${stats.totalExpenses.toLocaleString('es-PE', { minimumFractionDigits: 2 })}\n`;
     }
     if (exportType === 'all') {
-      csvContent += `Balance:,S/ ${stats.balance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}\n`;
+      csvContent += `Balance:,${symbol} ${stats.balance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}\n`;
     }
     csvContent += '\n';
     

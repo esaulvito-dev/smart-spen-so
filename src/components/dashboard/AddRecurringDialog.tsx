@@ -15,6 +15,7 @@ import {
   Frequency,
   FREQUENCY_LABELS 
 } from '@/hooks/useRecurringTransactions';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface AddRecurringDialogProps {
   editRecurring?: RecurringTransaction | null;
@@ -41,6 +42,7 @@ export function AddRecurringDialog({ editRecurring, open, onOpenChange }: AddRec
   const createRecurring = useCreateRecurringTransaction();
   const updateRecurring = useUpdateRecurringTransaction();
   const { toast } = useToast();
+  const { symbol } = useCurrency();
 
   const isControlled = open !== undefined;
   const isOpen = isControlled ? open : internalOpen;
@@ -174,7 +176,7 @@ export function AddRecurringDialog({ editRecurring, open, onOpenChange }: AddRec
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="recurring-amount" className="text-sm">Monto</Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">S/</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{symbol}</span>
               <Input
                 id="recurring-amount"
                 type="number"

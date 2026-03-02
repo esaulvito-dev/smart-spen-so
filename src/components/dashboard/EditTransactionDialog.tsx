@@ -17,6 +17,7 @@ import {
 } from '@/hooks/useTransactions';
 import { useCustomCategories, useCreateCustomCategory } from '@/hooks/useCustomCategories';
 import { cn } from '@/lib/utils';
+import { useCurrency } from '@/hooks/useCurrency';
 
 const EMOJI_OPTIONS = ['📋', '💰', '🏪', '🎁', '✈️', '🎓', '💻', '🏋️', '🎵', '📱', '🚀', '💡', '🔧', '📦', '🛒', '💳'];
 
@@ -48,6 +49,7 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: EditT
   const { data: customCategories = [] } = useCustomCategories();
   const createCustomCategory = useCreateCustomCategory();
   const { toast } = useToast();
+  const { symbol, locale } = useCurrency();
 
   // Filter custom categories based on transaction type
   const filteredCustomCategories = useMemo(() => {
@@ -188,7 +190,7 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: EditT
       
       toast({
         title: 'Transacción actualizada',
-        description: `Se ha actualizado ${type === 'income' ? 'el ingreso' : 'el gasto'} de S/ ${parsedAmount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`,
+        description: `Se ha actualizado ${type === 'income' ? 'el ingreso' : 'el gasto'} de ${symbol} ${parsedAmount.toLocaleString(locale, { minimumFractionDigits: 2 })}`,
       });
       
       onOpenChange(false);
@@ -243,7 +245,7 @@ export function EditTransactionDialog({ transaction, open, onOpenChange }: EditT
             <div className="space-y-1.5 sm:space-y-2">
               <Label htmlFor="edit-amount" className="text-sm">Monto</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">S/</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{symbol}</span>
                 <Input
                   id="edit-amount"
                   type="number"

@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { useCurrency } from '@/hooks/useCurrency';
 
 const EMOJI_OPTIONS = ['📋', '💰', '🏪', '🎁', '✈️', '🎓', '💻', '🏋️', '🎵', '📱', '🚀', '💡', '🔧', '📦', '🛒', '💳'];
 
@@ -36,6 +37,7 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
   const { data: customCategories = [] } = useCustomCategories();
   const createCustomCategory = useCreateCustomCategory();
   const { toast } = useToast();
+  const { symbol, locale } = useCurrency();
 
   // Filter custom categories based on transaction type
   const filteredCustomCategories = useMemo(() => {
@@ -132,7 +134,7 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
       
       toast({
         title: type === 'income' ? 'Ingreso registrado' : 'Gasto registrado',
-        description: `Se ha registrado ${type === 'income' ? 'un ingreso' : 'un gasto'} de S/ ${parsedAmount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}`,
+        description: `Se ha registrado ${type === 'income' ? 'un ingreso' : 'un gasto'} de ${symbol} ${parsedAmount.toLocaleString(locale, { minimumFractionDigits: 2 })}`,
       });
       
       // Reset form
@@ -206,7 +208,7 @@ export function AddTransactionDialog({ defaultType = 'expense' }: AddTransaction
             <div className="space-y-1.5 sm:space-y-2">
               <Label htmlFor="amount" className="text-sm">Monto</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">S/</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{symbol}</span>
                 <Input
                   id="amount"
                   type="number"

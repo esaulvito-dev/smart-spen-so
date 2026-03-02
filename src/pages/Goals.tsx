@@ -11,8 +11,10 @@ import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { format, differenceInDays, isPast } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export default function Goals() {
+  const { formatCurrency } = useCurrency();
   const [editingGoal, setEditingGoal] = useState<SavingsGoal | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [addToGoal, setAddToGoal] = useState<SavingsGoal | null>(null);
@@ -109,7 +111,7 @@ export default function Goals() {
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Total ahorrado</p>
                   <p className="text-xl sm:text-2xl font-bold text-success">
-                    S/ {totalSaved.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                    {formatCurrency(totalSaved)}
                   </p>
                 </CardContent>
               </Card>
@@ -117,7 +119,7 @@ export default function Goals() {
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Objetivo total</p>
                   <p className="text-xl sm:text-2xl font-bold">
-                    S/ {totalTarget.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                    {formatCurrency(totalTarget)}
                   </p>
                 </CardContent>
               </Card>
@@ -198,10 +200,10 @@ export default function Goals() {
                           <Progress value={Math.min(percentage, 100)} className="h-2" />
                           <div className="flex justify-between text-sm">
                             <span className="text-success font-medium">
-                              S/ {Number(goal.current_amount).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              {formatCurrency(Number(goal.current_amount))}
                             </span>
                             <span className="text-muted-foreground">
-                              de S/ {Number(goal.target_amount).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              de {formatCurrency(Number(goal.target_amount))}
                             </span>
                           </div>
                         </div>
@@ -272,7 +274,7 @@ export default function Goals() {
                               <CheckCircle className="w-4 h-4 text-success" />
                             </h3>
                             <p className="text-sm text-success font-medium">
-                              S/ {Number(goal.target_amount).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              {formatCurrency(Number(goal.target_amount))}
                             </p>
                           </div>
                         </div>

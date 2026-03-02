@@ -8,6 +8,7 @@ import { TrendingUp, Loader2 } from 'lucide-react';
 import { useMemo } from 'react';
 import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useCurrency } from '@/hooks/useCurrency';
 
 // Extract custom category name from description
 const extractCustomCategory = (desc: string | null): string | null => {
@@ -17,6 +18,7 @@ const extractCustomCategory = (desc: string | null): string | null => {
 };
 
 export default function Income() {
+  const { formatCurrency } = useCurrency();
   const now = new Date();
   const startDate = format(startOfMonth(now), 'yyyy-MM-dd');
   const endDate = format(endOfMonth(now), 'yyyy-MM-dd');
@@ -111,7 +113,7 @@ export default function Income() {
                 <div className="min-w-0">
                   <p className="text-xs sm:text-sm text-muted-foreground truncate">Ingresos de {currentMonth}</p>
                   <p className="text-2xl sm:text-3xl font-bold text-success">
-                    +S/ {monthlyIncome.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    +{formatCurrency(monthlyIncome)}
                   </p>
                 </div>
                 <div className="w-12 h-12 sm:w-16 sm:h-16 gradient-income rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0">
@@ -140,7 +142,7 @@ export default function Income() {
                             <span className="font-medium text-sm sm:text-base truncate">{label}</span>
                           </div>
                           <span className="font-semibold text-sm sm:text-base shrink-0">
-                            S/ {amount.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            {formatCurrency(amount)}
                           </span>
                         </div>
                         <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
