@@ -12,7 +12,7 @@ import { AvatarCropper } from '@/components/settings/AvatarCropper';
 import { useToast } from '@/hooks/use-toast';
 import { Settings as SettingsIcon, User, Palette, Loader2, Check, Upload, Trash2, Camera, DollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CurrencyCode, CURRENCY_CONFIG } from '@/hooks/useCurrency';
+import { useCurrency, CurrencyCode, CURRENCY_CONFIG } from '@/hooks/useCurrency';
 
 const themeColors = [
   { id: 'emerald', name: 'Esmeralda', color: 'bg-[hsl(160,84%,39%)]' },
@@ -26,6 +26,7 @@ export default function SettingsPage() {
   const { user } = useAuth();
   const { data: profile, isLoading, refetch } = useProfile();
   const updateProfile = useUpdateProfile();
+  const { exchangeRate } = useCurrency();
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -452,7 +453,10 @@ export default function SettingsPage() {
                 })}
               </div>
               <p className="text-xs sm:text-sm text-muted-foreground mt-4 text-center">
-                La moneda se aplica a todos los paneles
+                La moneda se aplica a todos los paneles con tipo de cambio en tiempo real
+              </p>
+              <p className="text-xs text-muted-foreground mt-1 text-center">
+                Tipo de cambio actual: 1 USD = {exchangeRate.toFixed(2)} PEN
               </p>
             </CardContent>
           </Card>
