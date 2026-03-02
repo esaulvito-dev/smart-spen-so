@@ -10,8 +10,9 @@ import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { AvatarCropper } from '@/components/settings/AvatarCropper';
 import { useToast } from '@/hooks/use-toast';
-import { Settings as SettingsIcon, User, Palette, Loader2, Check, Upload, Trash2, Camera } from 'lucide-react';
+import { Settings as SettingsIcon, User, Palette, Loader2, Check, Upload, Trash2, Camera, DollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { CurrencyCode, CURRENCY_CONFIG } from '@/hooks/useCurrency';
 
 const themeColors = [
   { id: 'emerald', name: 'Esmeralda', color: 'bg-[hsl(160,84%,39%)]' },
@@ -30,6 +31,7 @@ export default function SettingsPage() {
 
   const [fullName, setFullName] = useState('');
   const [selectedTheme, setSelectedTheme] = useState('emerald');
+  const [selectedCurrency, setSelectedCurrency] = useState<CurrencyCode>('PEN');
   const [cropperOpen, setCropperOpen] = useState(false);
   const [tempImageUrl, setTempImageUrl] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -39,6 +41,7 @@ export default function SettingsPage() {
     if (profile) {
       setFullName(profile.full_name || '');
       setSelectedTheme(profile.theme_color || 'emerald');
+      setSelectedCurrency((profile.currency as CurrencyCode) || 'PEN');
     }
   }, [profile]);
 
@@ -393,6 +396,63 @@ export default function SettingsPage() {
               
               <p className="text-xs sm:text-sm text-muted-foreground mt-4 text-center">
                 El tema se aplica a todo tu dashboard
+              </p>
+            </CardContent>
+          </Card>
+
+          {/* Currency Settings */}
+          <Card className="shadow-soft border-border/50">
+            <CardHeader className="pb-2 sm:pb-4">
+              <div className="flex items-center gap-3">
+                <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+                <div>
+                  <CardTitle className="text-base sm:text-lg">Moneda</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm">Selecciona tu moneda preferida</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="px-3 sm:px-6">
+              <div className="grid grid-cols-2 gap-2 sm:gap-4">
+                {(Object.entries(CURRENCY_CONFIG) as [CurrencyCode, typeof CURRENCY_CONFIG[CurrencyCode]][]).map(([code, config]) => {
+                  const isSelected = selectedCurrency === code;
+                  return (
+                    <button
+                      key={code}
+                      onClick={async () => {
+                        setSelectedCurrency(code);
+                        try {
+                          await updateProfile.mutateAsync({ currency: code } as any);
+                          toast({ title: 'Moneda actualizada', description: `Se cambió a ${config.name}` });
+                        } catch {
+                          toast({ title: 'Error', description: 'No se pudo actualizar la moneda.', variant: 'destructive' });
+                        }
+                      }}
+                      className={cn(
+                        'flex flex-col items-center gap-1.5 sm:gap-2 p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all active:scale-95',
+                        isSelected
+                          ? 'border-primary bg-primary/5 shadow-glow'
+                          : 'border-border hover:border-primary/50'
+                      )}
+                    >
+                      <div className={cn(
+                        'w-10 h-10 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-md transition-transform bg-primary/10 text-primary font-bold text-lg sm:text-xl',
+                        isSelected && 'scale-110 bg-primary text-primary-foreground'
+                      )}>
+                        {config.symbol}
+                      </div>
+                      <span className={cn(
+                        'text-xs sm:text-sm font-medium',
+                        isSelected && 'text-primary'
+                      )}>
+                        {config.name}
+                      </span>
+                      {isSelected && <Check className="w-4 h-4 text-primary" />}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-4 text-center">
+                La moneda se aplica a todos los paneles
               </p>
             </CardContent>
           </Card>

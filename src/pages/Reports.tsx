@@ -9,6 +9,7 @@ import { FileText, Loader2, Download, TrendingUp, TrendingDown, Wallet, PiggyBan
 import { useTransactions, CATEGORY_LABELS, CATEGORY_ICONS, TransactionCategory } from '@/hooks/useTransactions';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import { useCurrency } from '@/hooks/useCurrency';
 
 type Period = 'current' | 'last' | 'last3' | 'last6' | 'year';
 
@@ -23,6 +24,7 @@ const PERIOD_LABELS: Record<Period, string> = {
 export default function Reports() {
   const [period, setPeriod] = useState<Period>('current');
   const reportRef = useRef<HTMLDivElement>(null);
+  const { formatCurrency, symbol } = useCurrency();
 
   const now = new Date();
 
@@ -91,7 +93,6 @@ export default function Reports() {
   }, [transactions]);
 
   const handleExportPDF = () => {
-    // Create a printable version
     const printContent = `
       <html>
         <head>
@@ -122,15 +123,15 @@ export default function Reports() {
           <div class="stats">
             <div class="stat-card">
               <p class="stat-label">Ingresos Totales</p>
-              <p class="stat-value income">+S/ ${stats.totalIncome.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+              <p class="stat-value income">+${symbol} ${stats.totalIncome.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
             </div>
             <div class="stat-card">
               <p class="stat-label">Gastos Totales</p>
-              <p class="stat-value expense">-S/ ${stats.totalExpenses.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+              <p class="stat-value expense">-${symbol} ${stats.totalExpenses.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
             </div>
             <div class="stat-card">
               <p class="stat-label">Balance</p>
-              <p class="stat-value" style="color: ${stats.balance >= 0 ? '#10B981' : '#EF4444'}">S/ ${stats.balance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
+              <p class="stat-value" style="color: ${stats.balance >= 0 ? '#10B981' : '#EF4444'}">${symbol} ${stats.balance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</p>
             </div>
             <div class="stat-card">
               <p class="stat-label">Tasa de Ahorro</p>
@@ -143,7 +144,7 @@ export default function Reports() {
             ${incomeByCategory.map(({ category, amount }) => `
               <div class="category-item">
                 <span>${CATEGORY_ICONS[category as TransactionCategory]} ${CATEGORY_LABELS[category as TransactionCategory]}</span>
-                <span class="income">S/ ${amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</span>
+                <span class="income">${symbol} ${amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</span>
               </div>
             `).join('')}
             ${incomeByCategory.length === 0 ? '<p style="color: #9CA3AF">Sin ingresos en este período</p>' : ''}
@@ -154,7 +155,7 @@ export default function Reports() {
             ${expensesByCategory.map(({ category, amount }) => `
               <div class="category-item">
                 <span>${CATEGORY_ICONS[category as TransactionCategory]} ${CATEGORY_LABELS[category as TransactionCategory]}</span>
-                <span class="expense">S/ ${amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</span>
+                <span class="expense">${symbol} ${amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}</span>
               </div>
             `).join('')}
             ${expensesByCategory.length === 0 ? '<p style="color: #9CA3AF">Sin gastos en este período</p>' : ''}
@@ -235,7 +236,7 @@ export default function Reports() {
                   <p className="text-xs text-muted-foreground">Ingresos</p>
                 </div>
                 <p className="text-xl sm:text-2xl font-bold text-success">
-                  +S/ {stats.totalIncome.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                  +{formatCurrency(stats.totalIncome)}
                 </p>
               </CardContent>
             </Card>
@@ -246,7 +247,7 @@ export default function Reports() {
                   <p className="text-xs text-muted-foreground">Gastos</p>
                 </div>
                 <p className="text-xl sm:text-2xl font-bold text-destructive">
-                  -S/ {stats.totalExpenses.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                  -{formatCurrency(stats.totalExpenses)}
                 </p>
               </CardContent>
             </Card>
@@ -260,7 +261,7 @@ export default function Reports() {
                   "text-xl sm:text-2xl font-bold",
                   stats.balance >= 0 ? "text-success" : "text-destructive"
                 )}>
-                  S/ {stats.balance.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                  {formatCurrency(stats.balance)}
                 </p>
               </CardContent>
             </Card>
@@ -302,7 +303,7 @@ export default function Reports() {
                           <span className="text-muted-foreground">({percentage.toFixed(1)}%)</span>
                         </div>
                         <span className="text-success font-medium">
-                          S/ {amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                          {formatCurrency(amount)}
                         </span>
                       </div>
                       <Progress value={percentage} className="h-2 [&>div]:bg-success" />
@@ -336,7 +337,7 @@ export default function Reports() {
                           <span className="text-muted-foreground">({percentage.toFixed(1)}%)</span>
                         </div>
                         <span className="text-destructive font-medium">
-                          S/ {amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                          {formatCurrency(amount)}
                         </span>
                       </div>
                       <Progress value={percentage} className="h-2 [&>div]:bg-destructive" />

@@ -11,12 +11,14 @@ import { ExportReportDialog } from '@/components/dashboard/ExportReportDialog';
 import { useTransactions, CATEGORY_LABELS, CATEGORY_ICONS, TransactionCategory } from '@/hooks/useTransactions';
 import { useCustomCategories } from '@/hooks/useCustomCategories';
 import { useProfile } from '@/hooks/useProfile';
+import { useCurrency } from '@/hooks/useCurrency';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wallet, TrendingUp, TrendingDown, PiggyBank, Loader2 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
 export default function Dashboard() {
   const { data: profile } = useProfile();
+  const { formatCurrency, symbol } = useCurrency();
   const now = new Date();
   const monthStart = startOfMonth(now);
   const monthEnd = endOfMonth(now);
@@ -108,10 +110,6 @@ export default function Dashboard() {
     allTransactions.filter(t => t.type === 'expense').slice(0, 5),
     [allTransactions]
   );
-
-  const formatCurrency = (amount: number) => {
-    return `S/ ${Math.abs(amount).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
 
   const currentMonth = format(now, "MMMM yyyy", { locale: es });
   const greeting = profile?.full_name 
@@ -212,7 +210,7 @@ export default function Dashboard() {
                               <span className="font-medium">{label}</span>
                             </div>
                             <span className="text-success font-medium">
-                              S/ {amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              {formatCurrency(amount)}
                             </span>
                           </div>
                           <Progress value={percentage} className="h-1.5 [&>div]:bg-success" />
@@ -267,7 +265,7 @@ export default function Dashboard() {
                               <span className="font-medium">{label}</span>
                             </div>
                             <span className="text-destructive font-medium">
-                              S/ {amount.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                              {formatCurrency(amount)}
                             </span>
                           </div>
                           <Progress value={percentage} className="h-1.5 [&>div]:bg-destructive" />

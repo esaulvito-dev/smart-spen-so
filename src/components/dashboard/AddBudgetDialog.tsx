@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Loader2 } from 'lucide-react';
 import { TransactionCategory, CATEGORY_LABELS } from '@/hooks/useTransactions';
 import { useCreateBudget, useUpdateBudget, Budget } from '@/hooks/useBudgets';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface AddBudgetDialogProps {
   existingCategories: TransactionCategory[];
@@ -29,6 +30,7 @@ export function AddBudgetDialog({ existingCategories, editBudget, open, onOpenCh
   const createBudget = useCreateBudget();
   const updateBudget = useUpdateBudget();
   const { toast } = useToast();
+  const { symbol, locale } = useCurrency();
 
   const isControlled = open !== undefined;
   const isOpen = isControlled ? open : internalOpen;
@@ -90,7 +92,7 @@ export function AddBudgetDialog({ existingCategories, editBudget, open, onOpenCh
         });
         toast({
           title: 'Presupuesto creado',
-          description: `Se ha creado un presupuesto de S/ ${parsedAmount.toLocaleString('es-PE', { minimumFractionDigits: 2 })} para ${CATEGORY_LABELS[category as TransactionCategory]}`,
+          description: `Se ha creado un presupuesto de ${symbol} ${parsedAmount.toLocaleString(locale, { minimumFractionDigits: 2 })} para ${CATEGORY_LABELS[category as TransactionCategory]}`,
         });
       }
       
@@ -160,7 +162,7 @@ export function AddBudgetDialog({ existingCategories, editBudget, open, onOpenCh
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="budget-amount" className="text-sm">Monto mensual</Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">S/</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{symbol}</span>
               <Input
                 id="budget-amount"
                 type="number"

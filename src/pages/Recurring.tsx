@@ -19,8 +19,10 @@ import { CATEGORY_LABELS, CATEGORY_ICONS, TransactionCategory } from '@/hooks/us
 import { AddRecurringDialog } from '@/components/dashboard/AddRecurringDialog';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { useCurrency } from '@/hooks/useCurrency';
 
 export default function Recurring() {
+  const { formatCurrency } = useCurrency();
   const [editingRecurring, setEditingRecurring] = useState<RecurringTransaction | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
@@ -106,7 +108,7 @@ export default function Recurring() {
 
       toast({
         title: 'Transacción registrada',
-        description: `Se registró ${r.type === 'income' ? 'el ingreso' : 'el gasto'} de S/ ${Number(r.amount).toLocaleString('es-PE', { minimumFractionDigits: 2 })}`,
+        description: `Se registró ${r.type === 'income' ? 'el ingreso' : 'el gasto'} de ${formatCurrency(Number(r.amount))}`,
       });
     } catch (error) {
       toast({
@@ -164,7 +166,7 @@ export default function Recurring() {
                 "font-bold",
                 r.type === 'income' ? 'text-success' : 'text-destructive'
               )}>
-                {r.type === 'income' ? '+' : '-'}S/ {Number(r.amount).toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                {r.type === 'income' ? '+' : '-'}{formatCurrency(Number(r.amount))}
               </p>
               <p className={cn(
                 "text-xs mt-1",
@@ -256,7 +258,7 @@ export default function Recurring() {
                 <CardContent className="p-4">
                   <p className="text-xs text-muted-foreground">Total mensual</p>
                   <p className="text-xl sm:text-2xl font-bold">
-                    S/ {monthlyTotal.toLocaleString('es-PE', { minimumFractionDigits: 2 })}
+                    {formatCurrency(monthlyTotal)}
                   </p>
                 </CardContent>
               </Card>

@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Loader2 } from 'lucide-react';
 import { useCreateSavingsGoal, useUpdateSavingsGoal, SavingsGoal } from '@/hooks/useSavingsGoals';
+import { useCurrency } from '@/hooks/useCurrency';
 
 interface AddGoalDialogProps {
   editGoal?: SavingsGoal | null;
@@ -26,6 +27,7 @@ export function AddGoalDialog({ editGoal, open, onOpenChange }: AddGoalDialogPro
   const createGoal = useCreateSavingsGoal();
   const updateGoal = useUpdateSavingsGoal();
   const { toast } = useToast();
+  const { symbol } = useCurrency();
 
   const isControlled = open !== undefined;
   const isOpen = isControlled ? open : internalOpen;
@@ -173,7 +175,7 @@ export function AddGoalDialog({ editGoal, open, onOpenChange }: AddGoalDialogPro
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="goal-target" className="text-sm">Monto objetivo</Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">S/</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{symbol}</span>
               <Input
                 id="goal-target"
                 type="number"
@@ -191,7 +193,7 @@ export function AddGoalDialog({ editGoal, open, onOpenChange }: AddGoalDialogPro
           <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="goal-current" className="text-sm">Monto actual (opcional)</Label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">S/</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">{symbol}</span>
               <Input
                 id="goal-current"
                 type="number"
