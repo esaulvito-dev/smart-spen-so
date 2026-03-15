@@ -132,7 +132,7 @@ export function AuthForm() {
       style={{ backgroundImage: `url(${loginBackground})` }}
     >
       {/* Overlay for better contrast */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70" />
+      <div className="absolute inset-0 bg-gradient-to-br from-black/85 via-black/70 to-black/85" />
 
       <div className="relative z-10 flex flex-col items-center justify-center w-full px-4 py-8">
         {/* Logo */}

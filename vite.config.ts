@@ -4,6 +4,9 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(() => ({
+  define: {
+    __LOVA_FIX_TRIGGER__: "false",
+  },
   server: {
     host: "::",
     port: 8080,
