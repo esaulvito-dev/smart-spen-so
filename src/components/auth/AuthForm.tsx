@@ -87,6 +87,11 @@ export function AuthForm() {
             variant: 'destructive',
           });
         } else {
+          const { error: signInAfterSignUpError } = await signIn(email, password);
+          if (signInAfterSignUpError) {
+            console.warn('No se pudo iniciar sesión automáticamente tras registrarse:', signInAfterSignUpError.message);
+          }
+
           navigate('/pending-approval', { replace: true });
           return;
         }
