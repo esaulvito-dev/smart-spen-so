@@ -35,11 +35,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   }
 
   if (!user) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   if (!accessValid) {
-    return <Navigate to={accessStatus === 'pending' ? '/registration-pending' : '/access-denied'} replace />;
+    return <Navigate to={accessStatus === "pending" ? "/pending-approval" : "/access-denied"} replace />;
   }
 
   return <>{children}</>;
@@ -49,7 +49,9 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Index />} />
-      <Route path="/registration-pending" element={<RegistrationPending />} />
+      <Route path="/login" element={<Index />} />
+      <Route path="/pending-approval" element={<RegistrationPending />} />
+      <Route path="/registration-pending" element={<Navigate to="/pending-approval" replace />} />
       <Route path="/access-denied" element={<AccessDenied />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/income" element={<ProtectedRoute><Income /></ProtectedRoute>} />
