@@ -79,19 +79,6 @@ export function AuthForm() {
           });
         }
       } else {
-        // Check if email is invited before allowing registration
-        const isInvited = await checkInvitation(email);
-        
-        if (!isInvited) {
-          toast({
-            title: 'Acceso restringido',
-            description: 'Necesitas una invitación para registrarte. Contacta al administrador.',
-            variant: 'destructive',
-          });
-          setLoading(false);
-          return;
-        }
-
         const { error } = await signUp(email, password, fullName);
         if (error) {
           toast({
@@ -100,8 +87,7 @@ export function AuthForm() {
             variant: 'destructive',
           });
         } else {
-          // Redirect to pending approval page
-          window.location.href = '/registration-pending';
+          navigate('/pending-approval', { replace: true });
           return;
         }
       }
