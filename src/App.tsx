@@ -24,7 +24,7 @@ import { Loader2 } from "lucide-react";
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading, accessValid, checkingAccess } = useAuth();
+  const { user, loading, accessValid, accessStatus, checkingAccess } = useAuth();
 
   if (loading || checkingAccess) {
     return (
@@ -38,9 +38,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
     return <Navigate to="/" replace />;
   }
 
-  // If user exists but access is not valid (deleted or expired)
   if (!accessValid) {
-    return <Navigate to="/access-denied" replace />;
+    return <Navigate to={accessStatus === 'pending' ? '/registration-pending' : '/access-denied'} replace />;
   }
 
   return <>{children}</>;

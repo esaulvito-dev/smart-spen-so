@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Clock, Mail, ArrowLeft, ShieldCheck } from 'lucide-react';
+import registrationPendingApprovalImage from '@/assets/registration-pending-approval.png';
 
 export default function RegistrationPending() {
   const navigate = useNavigate();
@@ -15,14 +16,21 @@ export default function RegistrationPending() {
           </div>
           <div>
             <CardTitle className="text-2xl font-bold">
-              ¡Registro Exitoso!
+              Registro enviado
             </CardTitle>
             <CardDescription className="text-base mt-2">
-              Tu cuenta ha sido creada correctamente
+              Tu cuenta está pendiente de aprobación administrativa
             </CardDescription>
           </div>
         </CardHeader>
         <CardContent className="space-y-6 px-6 pb-8">
+          <img
+            src={registrationPendingApprovalImage}
+            alt="Estado de registro pendiente de aprobación"
+            loading="lazy"
+            className="w-full rounded-xl border border-border"
+          />
+
           <div className="bg-muted/50 rounded-xl p-5 space-y-4">
             <div className="flex items-start gap-3">
               <ShieldCheck className="w-5 h-5 text-primary mt-0.5 shrink-0" />
@@ -33,14 +41,14 @@ export default function RegistrationPending() {
             <div className="flex items-start gap-3">
               <Mail className="w-5 h-5 text-primary mt-0.5 shrink-0" />
               <p className="text-sm text-foreground">
-                Recibirás una notificación cuando tu acceso haya sido aprobado. También puedes verificar tu correo electrónico para confirmar tu cuenta.
+                Cuando el administrador apruebe tu registro, podrás ingresar con normalidad.
               </p>
             </div>
           </div>
 
           <div className="bg-accent/30 rounded-xl p-4 border border-accent">
             <p className="text-sm text-muted-foreground text-center">
-              Una vez aprobado por el administrador, podrás iniciar sesión con tu correo y contraseña registrados.
+              Si aún no está aprobado, seguirás viendo este mensaje al intentar entrar.
             </p>
           </div>
 
