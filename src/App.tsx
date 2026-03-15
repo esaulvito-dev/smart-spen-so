@@ -17,6 +17,7 @@ import AIAdvisor from "./pages/AIAdvisor";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import AccessDenied from "./pages/AccessDenied";
+import RegistrationPending from "./pages/RegistrationPending";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 

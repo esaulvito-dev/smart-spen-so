@@ -116,11 +116,9 @@ export function AuthForm() {
             variant: 'destructive',
           });
         } else {
-          toast({
-            title: '¡Registro exitoso!',
-            description: 'Tu cuenta ha sido creada. Ya puedes iniciar sesión.',
-          });
-          setIsLogin(true);
+          // Redirect to pending approval page
+          window.location.href = '/registration-pending';
+          return;
         }
       }
     } finally {
