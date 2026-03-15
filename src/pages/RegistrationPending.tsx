@@ -3,10 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Clock3, Mail, Loader2, LogOut } from "lucide-react";
-import pendingApprovalStateImage from "@/assets/pending-approval-state.png";
+import { Clock, Mail, Loader2, LogOut } from "lucide-react";
 
 export default function RegistrationPending() {
   const navigate = useNavigate();
@@ -17,7 +15,7 @@ export default function RegistrationPending() {
 
   const handleVerifyStatus = async () => {
     if (!user?.id) {
-      navigate("/login", { replace: true });
+      navigate("/", { replace: true });
       return;
     }
 
@@ -34,7 +32,7 @@ export default function RegistrationPending() {
 
       if (isActive && isValid) {
         await recheckAccess();
-        navigate("/", { replace: true });
+        navigate("/dashboard", { replace: true });
         return;
       }
 
@@ -42,7 +40,7 @@ export default function RegistrationPending() {
         description: "Tu cuenta aún está en revisión.",
       });
     } catch (error) {
-      console.error("Error verificando estado de autorización:", error);
+      console.error("Error verificando estado:", error);
       toast({
         title: "No se pudo verificar",
         description: "Intenta nuevamente en unos minutos.",
@@ -57,62 +55,73 @@ export default function RegistrationPending() {
     setSigningOut(true);
     try {
       await signOut();
-      navigate("/login", { replace: true });
+      navigate("/", { replace: true });
     } finally {
       setSigningOut(false);
     }
   };
 
   return (
-    <div className="dark min-h-screen min-h-[100dvh] bg-background p-4 sm:p-6 lg:p-8">
-      <div className="mx-auto flex min-h-[calc(100dvh-2rem)] w-full max-w-3xl items-center justify-center sm:min-h-[calc(100dvh-3rem)] lg:min-h-[calc(100dvh-4rem)]">
-        <Card className="w-full border-border/80 bg-card/95 shadow-elevated backdrop-blur-md">
-          <CardHeader className="space-y-5 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent/15">
-              <Clock3 className="h-8 w-8 text-accent" />
-            </div>
-            <div className="space-y-2">
-              <CardTitle className="text-3xl font-bold text-foreground">Solicitud Recibida</CardTitle>
-              <CardDescription className="mx-auto max-w-xl text-base text-muted-foreground">
-                Tu cuenta <span className="font-semibold text-foreground">{user?.email ?? "(sin correo disponible)"}</span> está en proceso de autorización. Te avisaremos por correo cuando el administrador te dé acceso.
-              </CardDescription>
-            </div>
-          </CardHeader>
+    <div className="min-h-screen min-h-[100dvh] flex items-center justify-center bg-[hsl(210,20%,98%)] p-4">
+      <div className="w-full max-w-md rounded-xl bg-[hsl(0,0%,100%)] shadow-lg p-8 space-y-6">
+        {/* Icon */}
+        <div className="flex justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(35,100%,96%)]">
+            <Clock className="h-8 w-8 text-[hsl(35,92%,50%)]" />
+          </div>
+        </div>
 
-          <CardContent className="space-y-6">
-            <img
-              src={pendingApprovalStateImage}
-              alt="Estado de solicitud pendiente de autorización"
-              loading="lazy"
-              className="h-auto w-full rounded-xl border border-border/70 object-cover"
-            />
+        {/* Title */}
+        <h1 className="text-2xl font-bold text-center text-[hsl(220,15%,15%)]">
+          Solicitud Recibida
+        </h1>
 
-            <div className="rounded-xl border border-accent/40 bg-accent/10 p-4 text-sm text-muted-foreground">
-              <div className="flex items-start gap-3">
-                <Mail className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
-                <p>
-                  Recibirás un correo electrónico con un enlace para iniciar sesión cuando tu cuenta sea autorizada por el administrador.
-                </p>
-              </div>
-            </div>
+        {/* Description */}
+        <p className="text-center text-[hsl(220,10%,45%)] text-sm leading-relaxed">
+          Tu cuenta{" "}
+          <span className="font-semibold text-[hsl(220,15%,15%)]">
+            {user?.email ?? ""}
+          </span>{" "}
+          está en proceso de autorización. Te avisaremos por correo cuando el
+          administrador te dé acceso.
+        </p>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Button variant="outline" onClick={handleVerifyStatus} disabled={verifying || signingOut}>
-                {verifying && <Loader2 className="h-4 w-4 animate-spin" />}
-                Verificar Estado
-              </Button>
-              <Button
-                variant="ghost"
-                onClick={handleSignOut}
-                disabled={verifying || signingOut}
-                className="border border-destructive/35 text-destructive hover:bg-destructive/10 hover:text-destructive"
-              >
-                {signingOut ? <Loader2 className="h-4 w-4 animate-spin" /> : <LogOut className="h-4 w-4" />}
-                Cerrar Sesión
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Alert box */}
+        <div className="rounded-lg border border-[hsl(45,80%,85%)] bg-[hsl(48,100%,96%)] p-4">
+          <div className="flex items-start gap-3">
+            <Mail className="mt-0.5 h-5 w-5 shrink-0 text-[hsl(38,75%,45%)]" />
+            <p className="text-sm text-[hsl(38,50%,30%)] leading-relaxed">
+              Recibirás un correo electrónico con un enlace para iniciar sesión
+              cuando tu cuenta sea autorizada por el administrador.
+            </p>
+          </div>
+        </div>
+
+        {/* Buttons */}
+        <div className="space-y-3 pt-2">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleVerifyStatus}
+            disabled={verifying || signingOut}
+          >
+            {verifying && <Loader2 className="h-4 w-4 animate-spin" />}
+            Verificar Estado
+          </Button>
+          <button
+            type="button"
+            onClick={handleSignOut}
+            disabled={verifying || signingOut}
+            className="w-full text-sm font-medium text-[hsl(220,10%,50%)] hover:text-[hsl(220,10%,30%)] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 py-2"
+          >
+            {signingOut ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <LogOut className="h-4 w-4" />
+            )}
+            Cerrar Sesión
+          </button>
+        </div>
       </div>
     </div>
   );
