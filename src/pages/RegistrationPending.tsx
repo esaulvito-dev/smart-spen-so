@@ -34,7 +34,7 @@ export default function RegistrationPending() {
 
       if (isActive && isValid) {
         await recheckAccess();
-        navigate("/dashboard", { replace: true });
+        navigate("/", { replace: true });
         return;
       }
 
