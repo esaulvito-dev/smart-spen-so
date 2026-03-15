@@ -63,21 +63,21 @@ export default function RegistrationPending() {
 
   return (
     <div className="min-h-screen min-h-[100dvh] flex items-center justify-center bg-[hsl(210,20%,98%)] p-4">
-      <div className="w-full max-w-md rounded-xl bg-[hsl(0,0%,100%)] shadow-lg p-8 space-y-6">
+      <div className="w-full max-w-md rounded-2xl bg-[hsl(0,0%,100%)] shadow-xl border border-[hsl(210,20%,94%)] p-8 text-center space-y-6">
         {/* Icon */}
         <div className="flex justify-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(35,100%,96%)]">
-            <Clock className="h-8 w-8 text-[hsl(35,92%,50%)]" />
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[hsl(30,100%,95%)]">
+            <Clock className="h-8 w-8 text-[hsl(30,90%,50%)]" />
           </div>
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold text-center text-[hsl(220,15%,15%)]">
+        <h1 className="text-2xl font-bold text-[hsl(220,15%,15%)]">
           Solicitud Recibida
         </h1>
 
         {/* Description */}
-        <p className="text-center text-[hsl(220,10%,45%)] text-sm leading-relaxed">
+        <p className="text-[hsl(220,10%,45%)] text-sm leading-relaxed">
           Tu cuenta{" "}
           <span className="font-semibold text-[hsl(220,15%,15%)]">
             {user?.email ?? ""}
@@ -88,7 +88,7 @@ export default function RegistrationPending() {
 
         {/* Alert box */}
         <div className="rounded-lg border border-[hsl(45,80%,85%)] bg-[hsl(48,100%,96%)] p-4">
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-3 text-left">
             <Mail className="mt-0.5 h-5 w-5 shrink-0 text-[hsl(38,75%,45%)]" />
             <p className="text-sm text-[hsl(38,50%,30%)] leading-relaxed">
               Recibirás un correo electrónico con un enlace para iniciar sesión
@@ -98,29 +98,24 @@ export default function RegistrationPending() {
         </div>
 
         {/* Buttons */}
-        <div className="space-y-3 pt-2">
+        <div className="grid grid-cols-2 gap-3 pt-2">
           <Button
-            variant="outline"
-            className="w-full"
+            className="w-full bg-[hsl(220,15%,15%)] text-[hsl(0,0%,100%)] rounded-lg hover:bg-[hsl(220,15%,25%)]"
             onClick={handleVerifyStatus}
             disabled={verifying || signingOut}
           >
-            {verifying && <Loader2 className="h-4 w-4 animate-spin" />}
+            {verifying ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
             Verificar Estado
           </Button>
-          <button
-            type="button"
+          <Button
+            variant="outline"
+            className="w-full bg-[hsl(0,0%,100%)] text-[hsl(0,70%,50%)] border-[hsl(0,60%,88%)] rounded-lg hover:bg-[hsl(0,80%,97%)]"
             onClick={handleSignOut}
             disabled={verifying || signingOut}
-            className="w-full text-sm font-medium text-[hsl(220,10%,50%)] hover:text-[hsl(220,10%,30%)] transition-colors disabled:opacity-50 flex items-center justify-center gap-2 py-2"
           >
-            {signingOut ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <LogOut className="h-4 w-4" />
-            )}
+            {signingOut ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <LogOut className="h-4 w-4 mr-2" />}
             Cerrar Sesión
-          </button>
+          </Button>
         </div>
       </div>
     </div>

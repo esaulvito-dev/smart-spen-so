@@ -81,17 +81,24 @@ export function AuthForm() {
       } else {
         const { error } = await signUp(email, password, fullName);
         if (error) {
-          toast({
-            title: 'Error al registrarse',
-            description: error.message,
-            variant: 'destructive',
-          });
+          const msg = error.message?.toLowerCase() ?? '';
+          if (msg.includes('already registered') || msg.includes('already been registered')) {
+            toast({
+              description: 'Este correo ya está registrado, por favor inicia sesión.',
+            });
+            setIsLogin(true);
+          } else {
+            toast({
+              title: 'Error al registrarse',
+              description: error.message,
+              variant: 'destructive',
+            });
+          }
         } else {
           const { error: signInAfterSignUpError } = await signIn(email, password);
           if (signInAfterSignUpError) {
-            console.warn('No se pudo iniciar sesión automáticamente tras registrarse:', signInAfterSignUpError.message);
+            console.warn('No se pudo iniciar sesión automáticamente:', signInAfterSignUpError.message);
           }
-
           navigate('/pending-approval', { replace: true });
           return;
         }
