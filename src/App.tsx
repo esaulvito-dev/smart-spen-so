@@ -19,6 +19,7 @@ import Admin from "./pages/Admin";
 import AccessDenied from "./pages/AccessDenied";
 import RegistrationPending from "./pages/RegistrationPending";
 import NotFound from "./pages/NotFound";
+import OAuthConsent from "./pages/OAuthConsent";
 import { Loader2 } from "lucide-react";
 
 const queryClient = new QueryClient();
@@ -52,6 +53,7 @@ function AppRoutes() {
       <Route path="/login" element={<Index />} />
       <Route path="/pending-approval" element={<RegistrationPending />} />
       <Route path="/registration-pending" element={<Navigate to="/pending-approval" replace />} />
+      <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
       <Route path="/access-denied" element={<AccessDenied />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
       <Route path="/income" element={<ProtectedRoute><Income /></ProtectedRoute>} />

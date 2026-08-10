@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -61,12 +61,16 @@ export function AuthForm() {
   const [fullName, setFullName] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
+    const next = searchParams.get('next');
+    const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : null;
 
     try {
       if (isLogin) {
@@ -77,6 +81,8 @@ export function AuthForm() {
             description: error.message,
             variant: 'destructive',
           });
+        } else if (safeNext) {
+          navigate(safeNext, { replace: true });
         }
       } else {
         const { error } = await signUp(email, password, fullName);
@@ -99,7 +105,7 @@ export function AuthForm() {
           if (signInAfterSignUpError) {
             console.warn('No se pudo iniciar sesión automáticamente:', signInAfterSignUpError.message);
           }
-          navigate('/pending-approval', { replace: true });
+          navigate(safeNext ?? '/pending-approval', { replace: true });
           return;
         }
       }
