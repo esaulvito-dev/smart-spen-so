@@ -1,0 +1,192 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://qwizgdnndemrnbgyaobn.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "lovable-finance-hub",
+      "version": "0.1.0",
+      "title": "Lovable Finance Hub"
+    },
+    "tools": [
+      {
+        "name": "list_transactions",
+        "title": "List transactions",
+        "description": "List the signed-in user's recent income and expense transactions, optionally filtered by type or date range.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "default": 20,
+              "description": "Maximum number of transactions to return.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "type": {
+              "description": "Filter by transaction type.",
+              "type": "string",
+              "enum": [
+                "income",
+                "expense"
+              ]
+            },
+            "start_date": {
+              "description": "Filter from this date (YYYY-MM-DD).",
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            },
+            "end_date": {
+              "description": "Filter up to this date (YYYY-MM-DD).",
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_transaction",
+        "title": "Create transaction",
+        "description": "Record a new income or expense transaction for the signed-in user. Amounts are stored in PEN ( soles).",
+        "annotations": {
+          "readOnlyHint": false,
+          "idempotentHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number",
+              "exclusiveMinimum": 0,
+              "description": "Transaction amount in positive numeric form."
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "income",
+                "expense"
+              ],
+              "description": "Whether this is income or expense."
+            },
+            "category": {
+              "type": "string",
+              "enum": [
+                "hogar",
+                "negocio",
+                "trabajo",
+                "alimentacion",
+                "transporte",
+                "entretenimiento",
+                "salud",
+                "educacion",
+                "servicios",
+                "otros"
+              ],
+              "description": "Budget category for the transaction."
+            },
+            "description": {
+              "description": "Short description or note.",
+              "type": "string",
+              "maxLength": 255
+            },
+            "date": {
+              "description": "Transaction date (YYYY-MM-DD); defaults to today.",
+              "type": "string",
+              "format": "date",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+            }
+          },
+          "required": [
+            "amount",
+            "type",
+            "category"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_budgets",
+        "title": "List budgets",
+        "description": "List the signed-in user's monthly budgets, optionally filtered by year and month.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "year": {
+              "description": "Year to filter budgets.",
+              "type": "integer",
+              "minimum": 2000,
+              "maximum": 2100
+            },
+            "month": {
+              "description": "Month to filter budgets (1-12).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 12
+            },
+            "limit": {
+              "default": 50,
+              "description": "Maximum budgets to return.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_savings_goals",
+        "title": "List savings goals",
+        "description": "List the signed-in user's savings goals and their progress.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "limit": {
+              "default": 50,
+              "description": "Maximum goals to return.",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "include_completed": {
+              "default": false,
+              "description": "Include goals already marked as completed.",
+              "type": "boolean"
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
